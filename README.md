@@ -1,6 +1,7 @@
 <h1>&#x1F6B2; fixi</h1> 
 
-fixi is a minimalist implementation of [generalized hypermedia controls](https://dl.acm.org/doi/fullHtml/10.1145/3648188.3675127):
+fixi is a minimalist implementation
+of [generalized hypermedia controls](https://dl.acm.org/doi/fullHtml/10.1145/3648188.3675127):
 
 ```html
 
@@ -27,9 +28,11 @@ for real world projects. This means it does not have many features found in htmx
 fixi takes advantage of some modern JavaScript features not used by htmx:
 
 * the [`fetch()` API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)
-* the use of [`MutationObserver`](https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver) for monitoring when new content is added
+* the use of [`MutationObserver`](https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver) for monitoring when
+  new content is added
 * [`async` functions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function)
-* The [View Transition API](https://developer.mozilla.org/en-US/docs/Web/API/View_Transition_API) (used by htmx, but the sole mechanism for transitions in fixi)
+* The [View Transition API](https://developer.mozilla.org/en-US/docs/Web/API/View_Transition_API) (used by htmx, but the
+  sole mechanism for transitions in fixi)
 
 ## Minimalism
 
@@ -79,7 +82,8 @@ cat fixi.js | openssl sha256 -binary | openssl base64
 You can also use the JSDelivr CDN for local development or testing:
 
 ```html
-<script src="https://cdn.jsdelivr.net/gh/bigskysoftware/fixi@0.0.1/fixi.js" 
+
+<script src="https://cdn.jsdelivr.net/gh/bigskysoftware/fixi@0.0.1/fixi.js"
         integrity="sha256-yJ5Uz683QbALhlxdK/butdndgiNHtyC+ORh0kVNaNII="></script>
 ```
 
@@ -100,7 +104,7 @@ The fixi api consists of six attributes and six events.
 
 #### Requests
 
-fixi works in a fairly straight foward manner, I encourage you to look at [the source](fixi.js).  It adds an event
+fixi works in a fairly straight foward manner, I encourage you to look at [the source](fixi.js). It adds an event
 listener to elements with the `fx-action` attribute.
 
 The default header send with fixi requests is `FX-Request`, which will have the value `true`.
@@ -170,7 +174,8 @@ This config object has the following properties:
 * `body` - The body of the request, if present, a FormData object that holds the data of the form associated with the
 * `drop` - Whether this request will be dropped, defaults to `true` if a request is already in flight
 * `transition` - Whether to use the View Transition API for swaps, defaults to `true`
-* `preventTriggerDefault` - A boolean (defaults to true) that, if true, will call `preventDefault()` on the triggering event
+* `preventTriggerDefault` - A boolean (defaults to true) that, if true, will call `preventDefault()` on the triggering
+  event
 * `signal` - The AbortSignal of the related AbortController for the request
 * `abort()` - A function that can be invoked to abort the pending fetch request
 
@@ -192,15 +197,15 @@ document.addEventListener("fx:before", (evt) => {
 ```
 
 Another property available on the `detail` of this event is `requests`, which will be an array of any existing
-outstanding requests for the element. 
+outstanding requests for the element.
 
 fixi does not implement request queuing like htmx does, but you can implement a simple
 "replace existing requests in flight" rule with the following JavaScript:
 
 ```js
 document.addEventListener("fx:before", (evt) => {
-  evt.detail.cfg.drop = false; // allow this request to be issued
-  evt.detail.requests.forEach((cfg) => cfg.abort());
+    evt.detail.cfg.drop = false; // allow this request to be issued
+    evt.detail.requests.forEach((cfg) => cfg.abort());
 })
 ```
 
@@ -275,6 +280,7 @@ function handleIndicator(elt, show) {
         document.querySelector(indicator).style.display = show ? 'initial' : 'none';
     }
 }
+
 document.addEventListener("fx:before", (evt) => {
     handleIndicator(evt.target, true);
 })
@@ -290,23 +296,35 @@ This example can be modified to use classes or other mechanisms for showing indi
 Here is an implementation of the Active Search example from htmx done in fixi:
 
 ```html
-
 <script>
-    document.addEventListener("DOMContentLoaded", () => {
-        let element = document.querySelector("#search");
-        element.addEventListener('search', () => element.dispatchEvent(new CustomEvent('doSearch')));
-        // debounce the input event at 200ms
-        let currentTimeout = null;
-        element.addEventListener('input', () => {
-            if (currentTimeout != null) {
-                clearTimeout(currentTimeout);
-            }
-            currentTimeout = setTimeout(() => {
-                element.dispatchEvent(new CustomEvent('doSearch'))
-                currentTimeout = null;
-            }, 200);
-        })
+  /**
+   * Debounces the debouncedEvent for the given delay, emitting a triggeredEvent if
+   * no new occurrences of the debounced event occur in the given delay interval, and
+   * resetting the delay if so
+   * 
+   * @param elt - the elt to listen for the `debouncedEvent` on
+   * @param debouncedEvent - the event type to debounce
+   * @param triggeredEvent - the event to trigger when the interval `delay` has eclipsed and no new events to debounce have occurred
+   * @param delay - the interval to wait for a new debouncedEvent before emitting a triggeredEvent
+   */
+  function debounce(elt, debouncedEvent, triggeredEvent, delay) {
+    let currentTimeout = null;
+    elt.addEventListener(debouncedEvent, () => {
+      if (currentTimeout != null) {
+        clearTimeout(currentTimeout);
+      }
+      currentTimeout = setTimeout(() => {
+        element.dispatchEvent(new CustomEvent(triggeredEvent))
+        currentTimeout = null;
+      }, delay);
     })
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    let element = document.querySelector("#search");
+    element.addEventListener('search', () => element.dispatchEvent(new CustomEvent('doSearch')));
+    debounce(element, 'input', 'doSearch', 200);
+  })
 </script>
 <input id="search" type="search" fx-action="/search" fx-trigger="doSearch" fx-target="#results" fx-swap="innerHTML"/>
 <table>
@@ -318,6 +336,7 @@ Here is an implementation of the Active Search example from htmx done in fixi:
 ```
 
 ## LICENCE
+
 ```
 Zero-Clause BSD
 =============
