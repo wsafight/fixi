@@ -40,7 +40,7 @@ fixi is an experiment
 in [software minimalism](https://ia601608.us.archive.org/8/items/pdfy-PeRDID4QHBNfcH7s/LeanSoftware_text.pdf).
 
 The goal is to keep the uncompressed, unminified library size under that of
-the [preact](https://bundlephobia.com/package/preact) project when preact is minified & compressed (currently 4.6Kb).
+the [preact](https://bundlephobia.com/package/preact) project, when preact is minified & compressed (currently 4.6Kb).
 
 Current size `4012` bytes as determined by:
 
@@ -54,11 +54,11 @@ Web developers should be able to use fixi unminified in order to debug the libra
 
 Like a fixed-gear bike, fixi provides very few bells and whistle:
 
-* No dependencies (including the test suite)
+* No dependencies (including the test suite, which is a self-contained testing system)
 * No JavaScript API (beyond the events)
 * No build step
 * No `package.json`
-* No `fx.min.js` file
+* No `fixi.min.js` file
 
 The project consists of three total files: this `README.md`, which is the documentation, `fixi.js` the code for the
 library and `test.html`, the test suite for the library.
