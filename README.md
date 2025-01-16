@@ -39,6 +39,12 @@ in [software minimalism](https://ia601608.us.archive.org/8/items/pdfy-PeRDID4QHB
 The goal is to keep the uncompressed, unminified library size under that of
 the [preact](https://bundlephobia.com/package/preact) project when preact is minified & compressed (currently 4.6Kb).
 
+Current size `4012` bytes as determined by:
+
+```bash
+ls -l fixi.js | awk  '{print $5}' 
+```
+
 Web developers should be able to use fixi unminified in order to debug the library at development time.
 
 ### A Fixed Gear Bike
