@@ -16,20 +16,20 @@ the output tag below it.
 In contrast to [htmx](https://htmx.org) fixi is designed to be as simple as possible while still being useful
 for real world projects. This means it does not have many features found in htmx, including:
 
-* request queueing
-* history support
-* extended selector support
-* extended event support
-* attribute inheritance
-* request indicators
-* CSS transitions
+* [request queueing](https://htmx.org/attributes/hx-sync/)
+* [history support](https://htmx.org/docs/#history)
+* [extended selector support](https://htmx.org/docs/#extended-css-selectors)
+* [extended event support](https://htmx.org/docs/#special-events)
+* [attribute inheritance](https://htmx.org/docs/#inheritance)
+* [request indicators](https://htmx.org/docs/#indicators)
+* [CSS transitions](https://htmx.org/docs/#css_transitions)
 
 fixi takes advantage of some modern JavaScript features not used by htmx:
 
-* the `fetch()` API
-* the use of `MutationObserver` for monitoring when new content is added
-* `async` functions
-* The view transition API (used by htmx, but the sole mechanism for transitions in fixi)
+* the [`fetch()` API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)
+* the use of [`MutationObserver`](https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver) for monitoring when new content is added
+* [`async` functions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function)
+* The [View Transition API](https://developer.mozilla.org/en-US/docs/Web/API/View_Transition_API) (used by htmx, but the sole mechanism for transitions in fixi)
 
 ## Minimalism
 
@@ -91,6 +91,18 @@ The fixi api consists of six attributes and six events.
 | `fx-swap`    | A string specifying how the content should be swapped into the DOM, one of `innerHTML`, `outerHTML`, `beforestart`, `afterstart`, `beforeend` or `afterend`.  `outerHTML` is the default. | `fx-swap='innerHTML'` |
 | `fx-trigger` | The event that will trigger a request.  Defaults to `submit` for `form` elements, `change` for `input`-like elements & `click` for all other elements                                     | `fx-trigger='click'`  |
 | `fx-ignore`  | Any element with this attribute on it or on a parent will not be processed for `fx-*` attributes                                                                                          | `fx-trigger='click'`  |
+
+#### Requests
+
+fixi works in a fairly straight foward manner, I encourage you to look at [the source](fixi.js).  It adds an event
+listener to elements with the `fx-action` attribute.
+
+The default header send with fixi requests is `FX-Request`, which will have the value `true`.
+
+If an element is within a form element or has a `form` attribute, the values of that form will be included with the
+request.
+
+#### Example
 
 Here is an example using all the attributes available in fixi:
 
