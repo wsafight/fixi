@@ -175,10 +175,8 @@ fixi does not implement request queuing like htmx does, but you can implement a 
 
 ```js
 document.addEventListener("fx:before", (evt) => {
-    evt.detail.cfg.drop = false; // allow this request to be issued
-    for (let cfg in evt.detail.requests) {
-        cfg.abort(); // abort any existing requests
-    }
+  evt.detail.cfg.drop = false; // allow this request to be issued
+  evt.detail.requests.forEach((cfg) => cfg.abort());
 })
 ```
 
