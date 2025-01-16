@@ -1,0 +1,416 @@
+<html>
+<head>
+    <script src="fixi.js"></script>
+    <script>
+        let tests = [];
+        let currentTest = null;
+        let passed = 0;
+        let failed = 0;
+        let find = (selector) => currentTest.testElt.querySelector(selector);
+        function fetchMockImpl(input, init){
+            if (init.signal && init.signal.aborted) {
+                throw new DOMException("Aborted", "AbortError");
+            }
+            for (let mock of currentTest.mocks) {
+                if (mock.path === input) {
+                    if (typeof mock.response === 'string' || mock.response instanceof String) {
+                        return Promise.resolve({text : () => Promise.resolve(mock.response)});
+                    } else {
+                        return Promise.resolve({text: () => Promise.resolve(mock.response(input, init))})
+                    }
+                }
+            }
+            throw `Unknown path: ${input}`;
+        }
+        function test(code){
+            let currentScript = document.currentScript;
+            let testElt = currentScript.closest('div');
+            tests.push(async ()=>{
+                currentTest.testElt = testElt;
+                let originalFetch = window.fetch;
+                window.fetch = fetchMockImpl;
+                try {
+                    await code();
+                    testElt.classList.add("passed");
+                    testElt.insertAdjacentHTML('beforeend', `<p>Passed</p>`)
+                    passed++;
+                    document.querySelector(".passed-info").querySelector("output").innerText = passed;
+                } catch (e) {
+                    testElt.classList.add("failed");
+                    testElt.insertAdjacentHTML('beforeend', `<p>ERROR: ${e}</p>`)
+                    failed++;
+                    document.querySelector(".failed-info").querySelector("output").innerText = failed;
+                } finally {
+                    window.fetch = originalFetch;
+                    currentTest = null;
+                }
+            })
+        }
+        function mock(path, response) {
+            currentTest.mocks ||= []
+            currentTest.mocks.push({path, response})
+        }
+        function sleep(ms) {
+            return new Promise((resolve) => {
+                setTimeout(resolve, ms);
+            })
+        }
+        function assertEq(actual, expected) {
+            if (expected !== actual) {
+                console.error("Expected", expected, "found", actual);
+                throw  `Expected ${expected} found ${actual}`
+            }
+        }
+        function assertEqTrimmed(actual, expected) {
+            if (expected !== actual?.trim()) {
+                console.error("Expected", expected, "found", actual);
+                throw  `Expected ${expected} found ${actual}`
+            }
+        }
+        document.addEventListener("fx:init", (evt) => console.log(evt))
+        document.addEventListener("fx:process", (evt) => console.log(evt))
+        document.addEventListener("fx:before", (evt) => console.log(evt))
+        document.addEventListener("fx:after", (evt) => console.log(evt))
+        document.addEventListener("fx:error", (evt) => console.error(evt, evt.detail.error))
+        document.addEventListener('DOMContentLoaded', async () => {
+            for (let i = 0; i < document.querySelectorAll(".test").length; i++){
+                const testBlock = document.querySelectorAll(".test")[i];
+                testBlock.querySelector("h3").insertAdjacentHTML("beforeend", ` - <a id='test${i}' href="test.html#test${i}">run</a>`)
+                let scriptElt = testBlock.querySelector("script");
+                scriptElt.insertAdjacentHTML("beforebegin", `<b>Code:</b><pre></pre>`)
+                scriptElt.previousElementSibling.innerText = scriptElt.innerText.replaceAll(/^ {8}/gm, '') + "\n";
+            }
+            for (let i = 0; i < tests.length; i++){
+                if (location.hash.indexOf("#test") === 0) {
+                    let index = parseInt(location.hash.substring(5));
+                    if (index !== i) {
+                        continue;
+                    }
+                }
+                currentTest = tests[i];
+                await currentTest();
+            }
+        });
+    </script>
+    <style>
+        .test {
+            padding: 8px;
+            margin: 8px;
+        }
+        .passed {
+            border: 3px solid green;
+        }
+        .failed {
+            border: 3px solid red;
+        }
+        .passed-info {
+            color: green;
+        }
+        .failed-info {
+            color: red;
+        }
+        pre {
+            padding: 4px;
+            margin: 12px;
+            border: 1px solid gray;
+            background-color: whitesmoke;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>&#x1F6B2; fixi test suite</h1>
+    <div>
+        <div class="passed-info">Passed: <output></output></div>
+        <div class="failed-info">Failed: <output></output></div>
+    </div>
+</header>
+
+<main>
+    <h2>Core</h2>
+    <div class="test">
+        <h3>Test basic button works</h3>
+        <script>
+            test(async ()=>{
+                mock("/demo", "<div>Foo</div>");
+                find('button').click();
+                await sleep(50);
+                assertEq(find('div')?.innerText, "Foo");
+            })
+        </script>
+        <button fx-action="/demo">
+            Button 1
+        </button>
+    </div>
+
+    <div class="test">
+        <h3>Test basic target works</h3>
+        <script>
+            test(async ()=>{
+                mock("/demo", "<div>Foo</div>");
+                find('button').click();
+                await sleep(50);
+                assertEq(find('div')?.innerText, "Foo");
+            })
+        </script>
+        <button fx-action="/demo" fx-target="#output1">
+            Button 1
+        </button>
+        <output id="output1">
+            Bar
+        </output>
+    </div>
+
+    <div class="test">
+        <h3>Test basic button with inner swap works</h3>
+        <script>
+            test(async ()=>{
+                mock("/demo", "<div>Foo</div>");
+                find('button').click();
+                await sleep(50);
+                assertEq(find('button')?.innerText, "Foo");
+            })
+        </script>
+        <button fx-action="/demo" fx-method="get" fx-swap="innerHTML">
+            Button 1
+        </button>
+    </div>
+
+    <div class="test">
+        <h3>Test added content is live</h3>
+        <script>
+            test(async ()=>{
+                mock("/demo", "<button fx-action='/demo2'>Button 2</button>");
+                mock("/demo2", "<div>Foo</div>");
+                find('button').click();
+                await sleep(50);
+                assertEq(find('button')?.innerText, "Button 2");
+                find('button').click();
+                await sleep(50);
+                assertEq(find('div')?.innerText, "Foo");
+            })
+        </script>
+        <button fx-action="/demo">
+            Button 1
+        </button>
+    </div>
+
+    <div class="test">
+        <h3>Test double-click works when drop disabled</h3>
+        <script>
+            test(async ()=>{
+                find('button').addEventListener("fx:before", (evt)=> evt.detail.cfg.drop = false) // don't drop any reqs
+                let i = 1;
+                mock("/demo", ()=>`<div>Foo${i++}</div>`);
+                find('button').click();
+                find('button').click();
+                await sleep(50);
+                assertEq(find('button')?.innerText, "Foo2");
+            })
+        </script>
+        <button fx-action="/demo" fx-method="get" fx-swap="innerHTML">
+            Button 1
+        </button>
+    </div>
+
+    <div class="test">
+        <h3>Test event-based throttling works</h3>
+        <script>
+            test(async ()=>{
+                let i = 1;
+                mock("/demo", ()=>`<div>Foo${i++}</div>`);
+                find("button").addEventListener("fx:before", (evt)=>{
+                    if (evt.detail.requests.length > 0) {
+                        evt.preventDefault();
+                    }
+                })
+                find('button').click();
+                find('button').click();
+                await sleep(50);
+                assertEq(find('button')?.innerText, "Foo1");
+            })
+        </script>
+        <button fx-action="/demo" fx-method="get" fx-swap="innerHTML">
+            Button 1
+        </button>
+    </div>
+
+    <div class="test">
+        <h3>Test event-based throttling w/delay works</h3>
+        <script>
+            test(async ()=>{
+                let i = 1;
+                mock("/demo", ()=>`<div>Foo${i++}</div>`);
+                find("button").addEventListener("fx:before", (evt)=>{
+                    if (evt.detail.requests.length > 0) {
+                        evt.preventDefault();
+                    }
+                })
+                find('button').click();
+                await sleep(50);
+                find('button').click();
+                await sleep(50);
+                assertEq(find('button')?.innerText, "Foo2");
+            })
+        </script>
+        <button fx-action="/demo" fx-method="get" fx-swap="innerHTML">
+            Button 1
+        </button>
+    </div>
+
+    <div class="test">
+        <h3>Test event-based aborting works</h3>
+        <script>
+            test(async ()=>{
+                mock("/demo", ()=>`<div>Foo</div>`);
+                find("button").addEventListener("fx:before", (evt)=>{
+                    evt.detail.cfg.abort();
+                })
+                find('button').click();
+                await sleep(50);
+                assertEq(find('button')?.innerText, "Button 1");
+            })
+        </script>
+        <button fx-action="/demo" fx-method="get" fx-swap="innerHTML">
+            Button 1
+        </button>
+    </div>
+
+    <div class="test">
+        <h3>Test event-based disabling works</h3>
+        <script>
+            test(async ()=>{
+                let i = 1;
+                mock("/demo", ()=>`<div>Foo${i++}</div>`);
+                find("button").addEventListener("fx:before", (evt)=>{
+                    evt.target.disabled = true;
+                })
+                find("button").addEventListener("fx:finally", (evt)=>{
+                    evt.target.disabled = true;
+                })
+                find('button').click();
+                find('button').click();
+                await sleep(50);
+                assertEq(find('button')?.innerText, "Foo1");
+            })
+        </script>
+        <button fx-action="/demo" fx-method="get" fx-swap="innerHTML">
+            Button 1
+        </button>
+    </div>
+
+    <div class="test">
+        <h3>Test basic form works</h3>
+        <script>
+            test(async ()=>{
+                mock("/demo", "<div>Foo</div>");
+                find('form').requestSubmit();
+                await sleep(50);
+                assertEq(find('div')?.innerText, "Foo");
+            })
+        </script>
+        <form id="f1" fx-action="/demo" fx-method="get">
+            Form1
+        </form>
+    </div>
+
+    <h2>Events</h2>
+
+    <div class="test">
+        <h3>Test basic fx:before triggered</h3>
+        <script>
+            test(async ()=>{
+                mock("/demo", "<div>Foo</div>");
+                let triggered = false;
+                find('button').addEventListener('fx:before', (evt) => {
+                    triggered = true;
+                })
+                find('button').click();
+                await sleep(50);
+                assertEq(triggered, true);
+                assertEq(find('div')?.innerText, "Foo");
+            })
+        </script>
+        <button fx-action="/demo">
+            Button 1
+        </button>
+    </div>
+
+    <div class="test">
+        <h3>Test basic fx:after triggered</h3>
+        <script>
+            test(async ()=>{
+                mock("/demo", "<div>Foo</div>");
+                let triggered = false;
+                find('button').addEventListener('fx:after', (evt) => {
+                    triggered = true;
+                })
+                find('button').click();
+                await sleep(50);
+                assertEq(triggered, true);
+                assertEq(find('div')?.innerText, "Foo");
+            })
+        </script>
+        <button fx-action="/demo">
+            Button 1
+        </button>
+    </div>
+
+    <div class="test">
+        <h3>Test basic fx:finally triggered</h3>
+        <script>
+            test(async ()=>{
+                mock("/demo", "<div>Foo</div>");
+                let triggered = false;
+                find('button').addEventListener('fx:finally', (evt) => {
+                    triggered = true;
+                })
+                find('button').click();
+                await sleep(50);
+                assertEq(triggered, true);
+                assertEq(find('div')?.innerText, "Foo");
+            })
+        </script>
+        <button fx-action="/demo">
+            Button 1
+        </button>
+    </div>
+
+    <div class="test">
+        <h3>Test fx:before can cancel request</h3>
+        <script>
+            test(async ()=>{
+                mock("/demo", "<div>Foo</div>");
+                let triggered = false;
+                find('button').addEventListener('fx:before', (evt) => {
+                    triggered = true;
+                    console.log(evt);
+                    evt.preventDefault();
+                })
+                find('button').click();
+                await sleep(50);
+                assertEq(triggered, true);
+                assertEq(find('div'), null);
+            })
+        </script>
+        <button fx-action="/demo">
+            Button 1
+        </button>
+    </div>
+</main>
+
+<footer>
+    <h2>Scratch</h2>
+
+    <form fx-action="/foo?" fx-swap="beforeend">
+        <input name="foo" value="bar">
+        <button name="blah">
+            Foo
+        </button>
+    </form>
+</footer>
+
+
+</body>
+</html>
