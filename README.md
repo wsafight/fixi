@@ -106,12 +106,12 @@ The fixi api consists of six attributes & six events.
 
 | attribute    | description                                                                                                                                                                               | example               |
 |--------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------|
-| `fx-action`  | The URL to which an HTTP request will be issued, required                                                                                                                                 | `fx-action='/demo'`   |
-| `fx-method`  | The HTTP Method that will be used for the request (case-insensitive), defaults to `GET`                                                                                                   | `fx-method='DELETE'`  |
-| `fx-target`  | A CSS selector specifying where to place the response HTML in the DOM, defaults to the current element                                                                                    | `fx-target='#a-div'`  |
-| `fx-swap`    | A string specifying how the content should be swapped into the DOM, one of `innerHTML`, `outerHTML`, `beforestart`, `afterstart`, `beforeend` or `afterend`.  `outerHTML` is the default. | `fx-swap='innerHTML'` |
-| `fx-trigger` | The event that will trigger a request.  Defaults to `submit` for `form` elements, `change` for `input`-like elements & `click` for all other elements                                     | `fx-trigger='click'`  |
-| `fx-ignore`  | Any element with this attribute on it or on a parent will not be processed for `fx-*` attributes                                                                                          | `                     |
+| `fx&#8209;action`  | The URL to which an HTTP request will be issued, required                                                                                                                                 | `fx&#8209;action='/demo'`   |
+| `fx&#8209;method`  | The HTTP Method that will be used for the request (case&#8209;insensitive), defaults to `GET`                                                                                                   | `fx&#8209;method='DELETE'`  |
+| `fx&#8209;target`  | A CSS selector specifying where to place the response HTML in the DOM, defaults to the current element                                                                                    | `fx&#8209;target='#a&#8209;div'`  |
+| `fx&#8209;swap`    | A string specifying how the content should be swapped into the DOM, one of `innerHTML`, `outerHTML`, `beforestart`, `afterstart`, `beforeend` or `afterend`.  `outerHTML` is the default. | `fx&#8209;swap='innerHTML'` |
+| `fx&#8209;trigger` | The event that will trigger a request.  Defaults to `submit` for `form` elements, `change` for `input`&#8209;like elements & `click` for all other elements                                     | `fx&#8209;trigger='click'`  |
+| `fx&#8209;ignore`  | Any element with this attribute on it or on a parent will not be processed for `fx&#8209;*` attributes                                                                                          | `                     |
 
 #### Requests
 
