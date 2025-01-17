@@ -211,7 +211,9 @@ Here is an example using all the attributes available in fixi:
 
 ```html
 
-<button fx-action="/demo" fx-method="GET" fx-target="#output" fx-swap="innerHTML" fx-trigger="click">
+<button fx-action="/demo" fx-method="GET" 
+        fx-target="#output" fx-swap="innerHTML" 
+        fx-trigger="click">
     Get Content
 </button>
 <output id="output" fx-ignore>--</output>
