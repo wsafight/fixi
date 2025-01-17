@@ -19,15 +19,15 @@ designed to be as simple as possible while still being useful for real world pro
 
 This means it does not have many of the features found in htmx, including:
 
-* [request queueing](https://htmx.org/attributes/hx-sync/)
-* [history support](https://htmx.org/docs/#history)
+* [request queueing & synchronization](https://htmx.org/attributes/hx-sync/)
 * [extended selector support](https://htmx.org/docs/#extended-css-selectors)
 * [extended event support](https://htmx.org/docs/#special-events)
 * [attribute inheritance](https://htmx.org/docs/#inheritance)
 * [request indicators](https://htmx.org/docs/#indicators)
 * [CSS transitions](https://htmx.org/docs/#css_transitions)
+* [history support](https://htmx.org/docs/#history)
 
-fixi takes advantage of some modern JavaScript features not used by htmx:
+  fixi takes advantage of some modern JavaScript features not used by htmx:
 
 * the [`fetch()` API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)
 * the use of [`MutationObserver`](https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver) for monitoring when
