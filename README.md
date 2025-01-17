@@ -161,7 +161,8 @@ The main entry point is found at the bottom of the file: on the `DOMContentLoade
 * It establishes a MutationObserver to watch for newly added content
 * It processes any existing fixi-powered elements
 
-fixi-powered elements are elements with the `fx-action` attribute on them.  
+fixi-powered elements are elements with the `fx-action` attribute on them.  fixi will ignore any elements that have the
+`fx-ignore` attribute on them or on a parent.
 
 When fixi finds one it will establish an event listener on that element that will dispatch an AJAX request via `fetch()` to
 the URL specified by `fx-action`.  
@@ -171,7 +172,7 @@ the trigger defaults to `submit` for `form` elements, `change` for `input`, `sel
 `click` for everything else.
 
 The [HTTP method](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods) of the request will be determined by the 
-`fx-method` attribute.  If that method is not present, it will default to `GET`.  This attribute is case-insensitive.
+`fx-method` attribute.  If this attribute is not present, it will default to `GET`.  This attribute is case-insensitive.
 
 fix sends the [request header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers) `FX-Request`, with the value 
 `true`.  You can add or remove headers using the `evt.detail.cfg.headers` object, see the `fx:before` event below.
