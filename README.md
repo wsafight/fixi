@@ -183,6 +183,7 @@ fixi config object, which can be found at `evt.detail.cfg`.
 
 This config object has the following properties:
 
+* `trigger` - The event that triggered the request
 * `method` - The HTTP Method that is going to be used
 * `action` - The URL that the request is going to be issued to
 * `headers` - An Object of name/value pairs to be sent as HTTP Request Headers
