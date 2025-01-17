@@ -71,9 +71,7 @@ Note that `test.html` is a stand-alone HTML file that implements its own visual 
 
 ## Installing
 
-fixi is not distributed via [NPM](https://www.npmjs.com/).
-
-Instead, it is intended to be [vendored](https://macwright.com/2021/03/11/vendor-by-default), that is copied, into your 
+fixi is intended to be [vendored](https://macwright.com/2021/03/11/vendor-by-default), that is copied, into your 
 project:
 
 ```bash
@@ -98,38 +96,113 @@ You can also use the JSDelivr CDN for local development or testing:
         integrity="sha256-t9iqudQ4aWygyLIZUsZf/AErBjy7+mu3LlFdcgidQcg="></script>
 ```
 
+fixi is not distributed via [NPM](https://www.npmjs.com/).
+
 ## API
 
 The fixi api consists of six attributes & six events.
 
 ### Attributes
 
-| attribute    | description                                                                                                                                                                               | example               |
-|--------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------|
-| `fx&#8209;action`  | The URL to which an HTTP request will be issued, required                                                                                                                                 | `fx&#8209;action='/demo'`   |
-| `fx&#8209;method`  | The HTTP Method that will be used for the request (case&#8209;insensitive), defaults to `GET`                                                                                                   | `fx&#8209;method='DELETE'`  |
-| `fx&#8209;target`  | A CSS selector specifying where to place the response HTML in the DOM, defaults to the current element                                                                                    | `fx&#8209;target='#a&#8209;div'`  |
-| `fx&#8209;swap`    | A string specifying how the content should be swapped into the DOM, one of `innerHTML`, `outerHTML`, `beforestart`, `afterstart`, `beforeend` or `afterend`.  `outerHTML` is the default. | `fx&#8209;swap='innerHTML'` |
-| `fx&#8209;trigger` | The event that will trigger a request.  Defaults to `submit` for `form` elements, `change` for `input`&#8209;like elements & `click` for all other elements                                     | `fx&#8209;trigger='click'`  |
-| `fx&#8209;ignore`  | Any element with this attribute on it or on a parent will not be processed for `fx&#8209;*` attributes                                                                                          | `                     |
+<table>
+<thead>
+<tr>
+  <th>attribute</th>
+  <th>description</th>
+  <th>example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td>
+    <code>fx&#8209;action</code>
+  </td>
+  <td>
+    The URL to which an HTTP request will be issued, required
+  </td>
+  <td>
+    <code>fx&#8209;action='/demo'</code>
+  </td>
+</tr>
+<tr>
+<td><code>fx&#8209;method</code></td>
+<td>The HTTP Method that will be used for the request (case&#8209;insensitive), defaults to <code>GET</code></td>
+<td><code>fx&#8209;method=&#39;DELETE&#39;</code></td>
+</tr>
+<tr>
+<td><code>fx&#8209;target</code></td>
+<td>A CSS selector specifying where to place the response HTML in the DOM, defaults to the current element</td>
+<td><code>fx&#8209;target=&#39;#a&#8209;div&#39;</code></td>
+</tr>
+<tr>
+<td><code>fx&#8209;swap</code></td>
+<td>A string specifying how the content should be swapped into the DOM, one of <code>innerHTML</code>, <code>outerHTML</code>, <code>beforestart</code>, <code>afterstart</code>, <code>beforeend</code> or <code>afterend</code>.  <code>outerHTML</code> is the default.</td>
+<td><code>fx&#8209;swap=&#39;innerHTML&#39;</code></td>
+</tr>
+<tr>
+<td><code>fx&#8209;trigger</code></td>
+<td>The event that will trigger a request.  Defaults to <code>submit</code> for <code>form</code> elements, <code>change</code> for <code>input</code>&#8209;like elements & <code>click</code> for all other elements</td>
+<td><code>fx&#8209;trigger=&#39;click&#39;</code></td>
+</tr>
+<tr>
+<td><code>fx&#8209;ignore</code></td>
+<td>Any element with this attribute on it or on a parent will not be processed for <code>fx&#8209;*</code> attributes</td>
+<td></td>
+</tr>
+</tbody>
+</table>
 
-#### Requests
+#### Mechanism
 
-fixi works in a fairly straight-forward manner, and I encourage you to look at [the source](fixi.js). 
+fixi works in a straight-forward manner and I encourage you to look at [the source](fixi.js). 
 
-The main entry point is that processes the initial DOM and any newly added content looking for elements with the `fx-action`
-attribute on them.  
+The main entry point is found at the bottom of the file: on the `DOMContentLoaded` event fixi does two things:
 
-When it finds one it will establish an event listener on that element that will dispatch an AJAX request via `fetch()` to
-the given URL, and the response HTML will be inserted into the DOM based on the other fixi attributes on the element.
+* It establishes a MutationObserver to watch for newly added content
+* It processes any existing fixi-powered elements
 
-The default header send with fixi requests is `FX-Request`, which will have the value `true`.
+fixi-powered elements are elements with the `fx-action` attribute on them.  
+
+When fixi finds one it will establish an event listener on that element that will dispatch an AJAX request via `fetch()` to
+the URL specified by `fx-action`.  
+
+The event that will trigger the request is determined by the `fx-trigger` attribute.  If that attribute is not present,
+the trigger defaults to `submit` for `form` elements, `change` for `input`, `select` & `textarea` elements, and 
+`click` for everything else.
+
+The [HTTP method](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods) of the request will be determined by the 
+`fx-method` attribute.  If that method is not present, it will default to `GET`.  This attribute is case-insensitive.
+
+fix sends the [request header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers) `FX-Request`, with the value 
+`true`.  You can add or remove headers using the `evt.detail.cfg.headers` object, see the `fx:before` event below.
 
 If an element is within a form element or has a `form` attribute, the values of that form will be included with the
-request.  Otherwise, if the element has a `name`, it's `name` and `value` will be sent with the request.
+request.  Otherwise, if the element has a `name`, it's `name` & `value` will be sent with the request.   You can add or 
+remove values using the `evt.detail.cfg.form` `FormData` object in the `fx:before` event.
 
 `GET` & `DELETE` requests will include values via query parameters, other request types will submit them as a form
 encoded body.
+
+Before a request is sent, the aforementioned `fx:before` event is triggered, which can be used to configure aspects of
+the request.  If `preventDefault()` is invoked, the request will not be sent.  The `evt.detail.cfg.drop` property will
+be set to `true` if there is an existing outstanding request and, if it is not set to `false`, the request will be 
+dropped.
+
+When fixi receives a response it triggers the `fx:after` event with the `response` and `text` values stored in the
+`evt.detail.cfg` object.  These can be inspected, and the `text` value can be updated if you want to transform it.
+
+fixi then swaps the response text into the DOM using the mechanism specified by `fx-swap`, targeting the element specified
+by `fx-target`.  If the `hx-swap` attribute is not present, fixi will use `outerHTML`.  If the `fx-target` attribute 
+is not present, it will target the element making the request.  
+
+The swap mechanism and target can be changed in the request-related fixi events.
+
+You can implement a custom swapping mechanism by setting a function in the `evt.detail.cfg.swap` property in one of
+the request related events.  This function should take two arguments: the target element and the text to swap.
+
+By default, swapping will occur in a [View Transition](https://developer.mozilla.org/en-US/docs/Web/API/View_Transition_API)
+if they are available.  If you don't want this to occur, you can set the `evt.detail.cfg.transition` property to false
+in one of the request-related events.
 
 #### Example
 
