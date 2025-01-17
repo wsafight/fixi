@@ -56,15 +56,15 @@ Like a fixed-gear bike, fixi provides very few bells & whistles:
 
 * No dependencies (including the test suite, which is a self-contained testing system)
 * No JavaScript API (beyond the events)
-* No build step
-* No `package.json`
 * No `fixi.min.js` file
+* No `package.json`
+* No build step
 
 The fixi project consists of three total files:
 
-* This `README.md`, which is the documentation
 * `fixi.js`, the code for the library
-* `test.html`, the test suite for the library.
+* `test.html`, the test suite for the library
+* This `README.md`, which is the documentation
 
 Note that `test.html` is a stand-alone HTML file that implements its own visual testing infrastructure, mocking for 
 `fetch()`, etc. and that can be opened using the `file:` protocol for easy testing.
