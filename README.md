@@ -52,7 +52,7 @@ Another design goal is that user should be able to use fixi unminified in order 
 
 The code style is dense, but the statements are structured for debugging.
 
-Like a fixed-gear bike, fixi provides very few bells & whistles:
+Like a fixed-gear bike, fixi has very few moving parts:
 
 * No dependencies (including the test suite, which is a self-contained testing system)
 * No JavaScript API (beyond the events)
@@ -60,7 +60,7 @@ Like a fixed-gear bike, fixi provides very few bells & whistles:
 * No `package.json`
 * No build step
 
-The fixi project consists of three total files:
+The fixi project consists of three files:
 
 * `fixi.js`, the code for the library
 * `test.html`, the test suite for the library
