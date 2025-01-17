@@ -14,8 +14,10 @@ of [generalized hypermedia controls](https://dl.acm.org/doi/fullHtml/10.1145/364
 This button will issue a `GET` request to the `/content` relative URL and place the HTML returned by that request inside
 the output tag below it.
 
-In contrast to [htmx](https://htmx.org) fixi is designed to be as simple as possible while still being useful
-for real world projects. This means it does not have many features found in htmx, including:
+fixi is [scheme](https://scheme.org/) to [htmx](https://htmx.org)'s [common lisp](https://lisp-lang.org/): it is 
+designed to be as simple as possible while still being useful for real world projects.
+
+This means it does not have many of the features found in htmx, including:
 
 * [request queueing](https://htmx.org/attributes/hx-sync/)
 * [history support](https://htmx.org/docs/#history)
@@ -51,7 +53,7 @@ Another design goal is that user should be able to use fixi unminified in order 
 
 The code style is dense, but the statements are structured for debugging.
 
-Like a fixed-gear bike, fixi provides very few bells and whistle:
+Like a fixed-gear bike, fixi provides very few bells & whistles:
 
 * No dependencies (including the test suite, which is a self-contained testing system)
 * No JavaScript API (beyond the events)
