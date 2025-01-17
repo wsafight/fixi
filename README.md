@@ -48,7 +48,8 @@ Current size `4012` bytes as determined by:
 ls -l fixi.js | awk  '{print $5}' 
 ```
 
-Web developers should be able to use fixi unminified in order to debug the library at development time.
+Web developers should be able to use fixi unminified in order to debug the library at development and
+deployment time.
 
 ### A Fixed Gear Bike
 
@@ -60,14 +61,20 @@ Like a fixed-gear bike, fixi provides very few bells and whistle:
 * No `package.json`
 * No `fixi.min.js` file
 
-The project consists of three total files: this `README.md`, which is the documentation, `fixi.js` the code for the
-library and `test.html`, the test suite for the library.
+The project consists of three total files:
 
-`test.html` is a stand-alone file that implements its own visual testing infrastructure as well as for mocking the
+* This `README.md`, which is the documentation
+* `fixi.js`, the code for the library
+* `test.html`, the test suite for the library.
+
+`test.html` is a stand-alone file that implements its own visual testing infrastructure, mocking for `fetch()`, etc.
 
 ## Installing
 
-fixi is not distributed via NPM. Instead, it is intended to be vendored into your project:
+fixi is not distributed via [NPM](https://www.npmjs.com/).
+
+Instead, it is intended to be [vendored](https://macwright.com/2021/03/11/vendor-by-default), that is copied, into your 
+project:
 
 ```bash
 curl https://raw.githubusercontent.com/bigskysoftware/fixi/refs/tags/0.0.1/fixi.js >> fixi-0.0.1.js
@@ -93,7 +100,7 @@ You can also use the JSDelivr CDN for local development or testing:
 
 ## API
 
-The fixi api consists of six attributes and six events.
+The fixi api consists of six attributes & six events.
 
 ### Attributes
 
@@ -108,13 +115,21 @@ The fixi api consists of six attributes and six events.
 
 #### Requests
 
-fixi works in a fairly straight foward manner, I encourage you to look at [the source](fixi.js). It adds an event
-listener to elements with the `fx-action` attribute.
+fixi works in a fairly straight-forward manner, and I encourage you to look at [the source](fixi.js). 
+
+The main entry point is that processes the initial DOM and any newly added content looking for elements with the `fx-action`
+attribute on them.  
+
+When it finds one it will establish an event listener on that element that will dispatch an AJAX request via `fetch()` to
+the given URL, and the response HTML will be inserted into the DOM based on the other fixi attributes on the element.
 
 The default header send with fixi requests is `FX-Request`, which will have the value `true`.
 
 If an element is within a form element or has a `form` attribute, the values of that form will be included with the
-request.
+request.  Otherwise, if the element has a `name`, it's `name` and `value` will be sent with the request.
+
+`GET` & `DELETE` requests will include values via query parameters, other request types will submit them as a form
+encoded body.
 
 #### Example
 
