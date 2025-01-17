@@ -156,6 +156,8 @@ The fixi api consists of six attributes & six events.
 
 fixi works in a straight-forward manner and I encourage you to look at [the source](fixi.js). 
 
+##### Processing
+
 The main entry point is found at the bottom of the file: on the `DOMContentLoaded` event fixi does two things:
 
 * It establishes a MutationObserver to watch for newly added content
@@ -163,6 +165,8 @@ The main entry point is found at the bottom of the file: on the `DOMContentLoade
 
 fixi-powered elements are elements with the `fx-action` attribute on them.  fixi will ignore any elements that have the
 `fx-ignore` attribute on them or on a parent.
+
+##### Requests
 
 When fixi finds one it will establish an event listener on that element that will dispatch an AJAX request via `fetch()` to
 the URL specified by `fx-action`.  
@@ -188,6 +192,8 @@ Before a request is sent, the aforementioned `fx:before` event is triggered, whi
 the request.  If `preventDefault()` is invoked, the request will not be sent.  The `evt.detail.cfg.drop` property will
 be set to `true` if there is an existing outstanding request and, if it is not set to `false`, the request will be 
 dropped.
+
+##### Swapping
 
 When fixi receives a response it triggers the `fx:after` event with the `response` and `text` values stored in the
 `evt.detail.cfg` object.  These can be inspected, and the `text` value can be updated if you want to transform it.
