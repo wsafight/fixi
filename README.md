@@ -220,8 +220,9 @@ Here is an example using all the attributes available in fixi:
 ```
 
 In this example, the button will issue a `GET` request to `/demo` and put the resulting HTML into the `innerHTML` of the
-output element with the id `output`. Because the `output` element is marked as `fx-ignore` and `fx-action` attributes
-in the content will be ignored.
+output element with the id `output`.
+
+Because the `output` element is marked as `fx-ignore`, any `fx-action` attributes in the new content will be ignored.
 
 ### Events
 
