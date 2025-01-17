@@ -29,10 +29,9 @@ This means it does not have many of the features found in htmx, including:
 
 fixi takes advantage of some modern JavaScript features not used by htmx:
 
-* the [`fetch()` API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)
-* the use of [`MutationObserver`](https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver) for monitoring when
-  new content is added
 * [`async` functions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function)
+* the [`fetch()` API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)
+* the use of [`MutationObserver`](https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver) for monitoring when new content is added
 * The [View Transition API](https://developer.mozilla.org/en-US/docs/Web/API/View_Transition_API) (used by htmx, but the
   sole mechanism for transitions in fixi)
 
