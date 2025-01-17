@@ -1,12 +1,7 @@
 (()=>{
     let requests = new Map()
-    let send = (elt, type, detail)=>{
-        let customEvent = new CustomEvent("fx:" + type, {detail:detail, cancelable:true, bubbles:true, composed:true})
-        return elt.dispatchEvent(customEvent)
-    }
-    let attr = (elt, attrName, defaultVal)=>{
-        return elt.getAttribute(attrName) || defaultVal
-    }
+    let send = (elt, type, detail)=>elt.dispatchEvent(new CustomEvent("fx:" + type, {detail: detail, cancelable: true, bubbles: true, composed: true}))
+    let attr = (elt, attrName, defaultVal)=> elt.getAttribute(attrName) || defaultVal
     let init = (elt)=>{
         if (!send(elt, "init")) return
         elt.addEventListener(attr(elt, "fx-trigger", elt.matches("form") ? "submit" : elt.matches("input,select,textarea") ? "change" : "click"),
