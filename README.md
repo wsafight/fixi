@@ -36,20 +36,20 @@ fixi takes advantage of some modern JavaScript features not used by htmx:
 
 ## Minimalism
 
-fixi is an experiment
-in [software minimalism](https://ia601608.us.archive.org/8/items/pdfy-PeRDID4QHBNfcH7s/LeanSoftware_text.pdf).
+fixi is in part an experiment in [software minimalism](https://ia601608.us.archive.org/8/items/pdfy-PeRDID4QHBNfcH7s/LeanSoftware_text.pdf).
 
-The goal is to keep the uncompressed, unminified library size under that of
+A goal of the project is to keep the uncompressed, unminified library size under that of
 the [preact](https://bundlephobia.com/package/preact) project, when preact is minified & compressed (currently 4.6Kb).
 
-The current size is `3485` bytes as determined by:
+The current uncompressed size is `3485` bytes and the gzip'd size is `1318` bytes as determined by:
 
 ```bash
-ls -l fixi.js | awk  '{print $5}' 
+ls -l fixi.js | awk  '{print "raw:", $5}'; gzip -k fixi.js; ls -l fixi.js.gz | awk  '{print "gzipped:", $5}'; rm fixi.js.gz 
 ```
 
-Web developers should be able to use fixi unminified in order to debug the library at development and
-deployment time.
+Another design goal is that user should be able to use fixi unminified in order to make debugging as simple as possible.
+
+The code style is dense, but the statements are structured for debugging.
 
 Like a fixed-gear bike, fixi provides very few bells and whistle:
 
@@ -59,13 +59,14 @@ Like a fixed-gear bike, fixi provides very few bells and whistle:
 * No `package.json`
 * No `fixi.min.js` file
 
-The project consists of three total files:
+The fixi project consists of three total files:
 
 * This `README.md`, which is the documentation
 * `fixi.js`, the code for the library
 * `test.html`, the test suite for the library.
 
-`test.html` is a stand-alone file that implements its own visual testing infrastructure, mocking for `fetch()`, etc.
+Note that `test.html` is a stand-alone HTML file that implements its own visual testing infrastructure, mocking for 
+`fetch()`, etc. and that can be opened using the `file:` protocol for easy testing.
 
 ## Installing
 
