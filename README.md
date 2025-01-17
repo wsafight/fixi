@@ -174,7 +174,7 @@ the trigger defaults to `submit` for `form` elements, `change` for `input`, `sel
 The [HTTP method](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods) of the request will be determined by the 
 `fx-method` attribute.  If this attribute is not present, it will default to `GET`.  This attribute is case-insensitive.
 
-fix sends the [request header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers) `FX-Request`, with the value 
+fixi sends the [request header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers) `FX-Request`, with the value 
 `true`.  You can add or remove headers using the `evt.detail.cfg.headers` object, see the `fx:before` event below.
 
 If an element is within a form element or has a `form` attribute, the values of that form will be included with the
