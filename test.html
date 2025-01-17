@@ -398,6 +398,28 @@
             Button 1
         </button>
     </div>
+
+    <div class="test">
+        <h3>Test evt.detail.cfg.swap can be a function</h3>
+        <script>
+            test(async ()=>{
+                mock("/demo", "<div>Foo</div>");
+                let swapped = false;
+                find('button').addEventListener('fx:before', (evt) => {
+                    evt.detail.cfg.swap = ()=>{
+                        swapped = true;
+                    }
+                })
+                find('button').click();
+                await sleep(50);
+                assertEq(swapped, true);
+                assertEq(find('div'), null);
+            })
+        </script>
+        <button fx-action="/demo">
+            Button 1
+        </button>
+    </div>
 </main>
 
 <footer>
