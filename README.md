@@ -51,8 +51,6 @@ ls -l fixi.js | awk  '{print $5}'
 Web developers should be able to use fixi unminified in order to debug the library at development and
 deployment time.
 
-### A Fixed Gear Bike
-
 Like a fixed-gear bike, fixi provides very few bells and whistle:
 
 * No dependencies (including the test suite, which is a self-contained testing system)
