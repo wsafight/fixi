@@ -116,6 +116,9 @@
             border: 1px solid rgb(128, 128, 128);
             background-color: whitesmoke;
         }
+        body.hide-passed .passed {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -125,6 +128,7 @@
     <div>
         <div class="passed-info">Passed: <output></output></div>
         <div class="failed-info">Failed: <output></output></div>
+        <a href="javascript:document.body.classList.toggle('hide-passed')">Toggle Passed</a>
     </div>
 </header>
 
@@ -237,7 +241,7 @@
             <h3>Test double-click works when drop disabled</h3>
             <script>
               test(async ()=>{
-                find('button').addEventListener("fx:before", (evt)=> evt.detail.cfg.drop = false) // don't drop any reqs
+                find('button').addEventListener("fx:config", (evt)=> evt.detail.cfg.drop = false) // don't drop any reqs
                 let i = 1;
                 mock("/demo", ()=>`<div>Foo${i++}</div>`);
                 find('button').click();
@@ -257,7 +261,7 @@
               test(async ()=>{
                 let i = 1;
                 mock("/demo", ()=>`<div>Foo${i++}</div>`);
-                find("button").addEventListener("fx:before", (evt)=>{
+                find("button").addEventListener("fx:config", (evt)=>{
                   if (evt.detail.requests.length > 0) {
                     evt.preventDefault();
                   }
@@ -279,7 +283,7 @@
               test(async ()=>{
                 let i = 1;
                 mock("/demo", ()=>`<div>Foo${i++}</div>`);
-                find("button").addEventListener("fx:before", (evt)=>{
+                find("button").addEventListener("fx:config", (evt)=>{
                   if (evt.detail.requests.length > 0) {
                     evt.preventDefault();
                   }
@@ -358,7 +362,7 @@
               test(async ()=>{
                 let allow = false;
                 mock("/demo", ()=>`<div>Foo</div>`);
-                find("button").addEventListener("fx:before", (evt)=>{
+                find("button").addEventListener("fx:config", (evt)=>{
                   evt.detail.cfg.confirm = ()=>allow
                 })
                 find('button').click();
@@ -367,6 +371,32 @@
                 allow = true;
                 find('button').click();
                 await sleep(50);
+                assertEq(find('div')?.innerText, "Foo");
+              })
+            </script>
+            <button fx-action="/demo" fx-method="get" fx-swap="innerHTML">
+                Button 1
+            </button>
+        </div>
+
+        <div class="test">
+            <h3>Test confirm-based can debouncing</h3>
+            <script>
+              test(async ()=>{
+                mock("/demo", ()=>`<div>Foo</div>`);
+                let latestPromise = null;
+                find("button").addEventListener("fx:config", (evt)=>{
+                  evt.detail.cfg.confirm = ()=>{
+                    let currentPromise = latestPromise = new Promise((resolve)=>{
+                      setTimeout(()=>resolve(currentPromise === latestPromise), 200)
+                    })
+                    return currentPromise
+                  }
+                })
+                find('button').click();
+                await sleep(50);
+                assertEq(find('button')?.innerText, "Button 1");
+                await sleep(200);
                 assertEq(find('div')?.innerText, "Foo");
               })
             </script>
@@ -416,10 +446,47 @@
             </button>
             <p>A Paragraph</p>
         </div>
+
+        <div class="test">
+            <h3>Lazy loading works as expected using fx:inited</h3>
+            <script>
+              test(async ()=>{
+                mock("/demo", `<div><p fx-action="/demo2" fx-trigger="fx:inited">Foo</p></div>`);
+                mock("/demo2", `Bar`);
+                let btn = find('button')
+                btn.click();
+                await sleep(50);
+                assertEq(btn.innerText, "Bar");
+              })
+            </script>
+            <button fx-action="/demo" fx-swap="innerHTML">
+                Button 1
+            </button>
+        </div>
     </section>
 
     <section id="events">
         <h2>Events</h2>
+
+        <div class="test">
+            <h3>Test basic fx:before triggered</h3>
+            <script>
+              test(async ()=>{
+                mock("/demo", "<div>Foo</div>");
+                let triggered = false;
+                find('button').addEventListener('fx:config', () => {
+                  triggered = true;
+                })
+                find('button').click();
+                await sleep(50);
+                assertEq(triggered, true);
+                assertEq(find('div')?.innerText, "Foo");
+              })
+            </script>
+            <button fx-action="/demo">
+                Button 1
+            </button>
+        </div>
 
         <div class="test">
             <h3>Test basic fx:before triggered</h3>
@@ -524,6 +591,32 @@
                 Button 1
             </button>
         </div>
+
+        <div class="test">
+            <h3>Test basic fx:inited triggered</h3>
+            <script>
+              test(async ()=>{
+                assertEq(find('button').classList.contains("fx-inited"), true);
+                assertEq(find('button').parentElement.classList.contains("fx-inited"), false);
+              })
+            </script>
+            <button fx-action="/demo" fx-trigger="fx:inited">
+                Button 1
+            </button>
+            <script>
+                let button = document.currentScript.previousElementSibling
+                button.addEventListener("fx:before", (evt)=>{
+                  evt.preventDefault(); // don't make the request
+                })
+                button.addEventListener("fx:inited", (evt)=>{
+                  button.classList.add("fx-inited")
+                })
+                button.parentElement.addEventListener("fx:inited", (evt)=>{
+                  button.classList.add("fx-inited")
+                })
+            </script>
+        </div>
+
     </section>
 
 </main>

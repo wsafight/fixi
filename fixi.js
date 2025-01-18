@@ -1,5 +1,5 @@
 (()=>{
-  let send = (elt, type, detail)=>elt.dispatchEvent(new CustomEvent("fx:" + type, {detail:detail, cancelable:true, bubbles:true, composed:true}))
+  let send = (elt, type, detail, bub)=>elt.dispatchEvent(new CustomEvent("fx:" + type, {detail:detail, cancelable:true, bubbles:bub!==false, composed:true}))
   let attr = (elt, attrName, defaultVal)=>elt.getAttribute(attrName) || defaultVal
   let init = (elt)=>{
     let options = {}
@@ -18,7 +18,7 @@
       let abort = new AbortController()
       let drop = reqs.length > 0
       let cfg = {trigger:evt, method, action, headers, target, swap, body, drop, signal:abort.signal, abort:(r)=>abort.abort(r), preventTriggerDefault:true, transition:true}
-      if (!send(elt, "before", {evt, cfg, requests:reqs}) || cfg.drop) return
+      if (!send(elt, "config", {evt, cfg, requests:reqs}) || cfg.drop) return
       if ((cfg.method === "GET" || cfg.method === "DELETE") && cfg.body){
         if (!cfg.body.entries().next().done) cfg.action += (cfg.action.indexOf("?") > 0 ? "&" : "?") + new URLSearchParams(cfg.body).toString()
         cfg.body = null
@@ -30,6 +30,7 @@
           let result = await cfg.confirm()
           if (!result) return
         }
+        if (!send(elt, "before", {evt, cfg, requests:reqs})) return
         cfg.response = await fetch(cfg.action, cfg)
         cfg.text = await cfg.response.text()
         if (!send(elt, "after", {evt, cfg})) return
@@ -58,6 +59,7 @@
     }
     elt.__fixi.evt = attr(elt, "fx-trigger", elt.matches("form") ? "submit" : elt.matches("input,select,textarea") ? "change" : "click")
     elt.addEventListener(elt.__fixi.evt, elt.__fixi, options)
+    send(elt, "inited", {}, false)
   }
   let process = (elt)=>{
     if (elt instanceof Element){
