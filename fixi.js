@@ -44,7 +44,7 @@
       }
       let doSwap = ()=>{
         if (cfg.swap instanceof Function){
-          cfg.swap(cfg.target, cfg.text)
+          return cfg.swap(cfg.target, cfg.text)
         } else if (cfg.swap === "outerHTML" || cfg.swap === "innerHTML"){
           cfg.target[cfg.swap] = cfg.text
         } else {
@@ -52,10 +52,11 @@
         }
       }
       if (cfg.transition && document.startViewTransition){
-        document.startViewTransition(doSwap)
+        await document.startViewTransition(doSwap).finished
       } else {
-        doSwap()
+        await doSwap()
       }
+      send(elt, "swapped")
     }
     elt.__fixi.evt = attr(elt, "fx-trigger", elt.matches("form") ? "submit" : elt.matches("input,select,textarea") ? "change" : "click")
     elt.addEventListener(elt.__fixi.evt, elt.__fixi, options)

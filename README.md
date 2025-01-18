@@ -4,18 +4,18 @@ fixi is an experimental, minimalist implementation
 of [generalized hypermedia controls](https://dl.acm.org/doi/fullHtml/10.1145/3648188.3675127):
 
 ```html
-
 <button fx-action="/content" fx-method="get" fx-target="#output" fx-swap="innerHTML">
     Get Content
 </button>
 <output id="output"></output>
 ```
 
-This button will issue a `GET` request to the `/content` [relative URL](https://www.w3.org/TR/WD-html40-970917/htmlweb.html#h-5.1.2) 
-and place the HTML returned by that request inside the output tag below it.
+This fixi-powered button will issue an HTTP `GET` request to the `/content` [relative URL](https://www.w3.org/TR/WD-html40-970917/htmlweb.html#h-5.1.2) 
+and insert the HTML response to that request inside the output tag below it.
 
-fixi is [scheme](https://scheme.org/) to [htmx](https://htmx.org)'s [common lisp](https://lisp-lang.org/): it is 
-designed to be as simple as possible while still being useful for real world projects.
+Philosophically, fixi is [scheme](https://scheme.org/) to [htmx](https://htmx.org)'s 
+[common lisp](https://lisp-lang.org/): it is designed to be as simple as possible while still being useful for real 
+world projects.
 
 This means it does not have many of the features found in htmx, including:
 
@@ -38,8 +38,8 @@ fixi takes advantage of some modern JavaScript features not used by htmx:
 
 fixi is in part an experiment in [software minimalism](https://ia601608.us.archive.org/8/items/pdfy-PeRDID4QHBNfcH7s/LeanSoftware_text.pdf).
 
-A goal of the project is to keep the uncompressed, unminified library size under that of
-the [preact](https://bundlephobia.com/package/preact) project, when preact is minified & compressed (currently 4.6Kb).
+A goal of the project is to keep the _unminified_, _uncompressed_ library size under that of
+the minified & compressed version of [preact](https://bundlephobia.com/package/preact) (currently 4.6Kb).
 
 The current uncompressed size is `3523` bytes and the gzip'd size is `1349` bytes as determined by:
 
@@ -47,25 +47,26 @@ The current uncompressed size is `3523` bytes and the gzip'd size is `1349` byte
 ls -l fixi.js | awk  '{print "raw:", $5}'; gzip -k fixi.js; ls -l fixi.js.gz | awk  '{print "gzipped:", $5}'; rm fixi.js.gz 
 ```
 
-Another design goal is that user should be able to use fixi unminified in order to make debugging as simple as possible.
+Another design goal is that users should be able to [debug](https://developer.chrome.com/docs/devtools/javascript/) 
+fixi easily, since it is small enough to use unminified.
 
-The code style is dense, but the statements are structured for debugging.
+The code style is [dense](fixi.js), but the statements are structured for debugging.
 
 Like a fixed-gear bike, fixi has very few moving parts:
 
-* No dependencies (including the test suite, which is a self-contained testing system)
-* No JavaScript API (beyond the events)
+* No dependencies (including test and development)
+* No JavaScript API (beyond the [events](#events))
 * No `fixi.min.js` file
 * No `package.json`
 * No build step
 
 The fixi project consists of three files:
 
-* `fixi.js`, the code for the library
-* `test.html`, the test suite for the library
-* This `README.md`, which is the documentation
+* [`fixi.js`](fixi.js), the code for the library
+* [`test.html`](test.html), the test suite for the library
+* This [`README.md`](README.md), which is the documentation
 
-Note that `test.html` is a stand-alone HTML file that implements its own visual testing infrastructure, mocking for 
+[`test.html`](test.html) is a stand-alone HTML file that implements its own visual testing infrastructure, mocking for 
 `fetch()`, etc. and that can be opened using the `file:` protocol for easy testing.
 
 ## Installing
@@ -237,6 +238,9 @@ By default, swapping will occur in a [View Transition](https://developer.mozilla
 if they are available.  If you don't want this to occur, you can set the `evt.detail.cfg.transition` property to false
 in one of the request-related events.
 
+When the swap and any associated View Transitions have completed, the `fx:swapped` event will be triggered on the 
+element.
+
 #### Example
 
 Here is an example using all the attributes available in fixi:
@@ -259,17 +263,93 @@ Because the `output` element is marked as `fx-ignore`, any `fx-action` attribute
 ### Events
 
 fixi fires the following events, broken into two categories:
-
-* Initialization related
-    * `fx:init` - triggered on elements that have a `fx-action` attribute and are about to be initialized by fixi
-    * `fx:inited` - triggered on elements have been initialized by fixi (does not bubble)
-    * `fx:process` - triggered on new content added to the DOM that is not filtered via the `fx-ignore` attribute
-* Fetch related
-    * `fx:config` - triggered on an element immediately when setting up a request
-    * `fx:before` - triggered on an element just before a `fetch()` request is made
-    * `fx:after` - triggered on an element just after a `fetch()` finishes normally but before content is swapped
-    * `fx:error` - triggered on an element if an exception occurs during a `fetch()`
-    * `fx:finally` - triggered after a request no matter what
+[](#fetch-events)
+<table>
+<thead>
+<tr>
+  <th>category</th>
+  <th>event</th>
+  <th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td rowspan="3"><a href="#initialization-events">initialization</a></td>
+<td>
+<a href="#fxinit"><code>fx:init</code></a>
+</td>
+<td>
+triggered on elements that have a <code>fx-action</code> attribute and are about to be initialized by fixi
+</td>
+</tr>
+<tr>
+<td>
+<a href="#fxinited"><code>fx:inited</code></a>
+</td>
+<td>
+triggered on elements have been initialized by fixi (does <b>not</b> bubble)
+</td>
+</tr>
+<tr>
+<td>
+<a href="#fxprocess"><code>fx:process</code></a>
+</td>
+<td>
+triggered on new content added to the DOM that is not filtered via the <code>fx-ignore</code> attribute
+</td>
+</tr>
+<tr>
+<td rowspan="5"><a href="#fetch-events">fetch</a></td>
+<td>
+<a href="#fxconfig"><code>fx:config</code></a>
+</td>
+<td>
+triggered on an element immediately when a request has been triggered, allowing users to configure the request
+</td>
+</tr>
+<tr>
+<td>
+<a href="#fxbefore"><code>fx:before</code></a>
+</td>
+<td>
+triggered on an element just before a <code>fetch()</code> request is made
+</td>
+</tr>
+<tr>
+<td>
+<a href="#fxafter"><code>fx:after</code></a>
+</td>
+<td>
+triggered on an element just after a <code>fetch()</code> request finishes normally but before content is swapped
+</td>
+</tr>
+<tr>
+<td>
+<a href="#fxerror"><code>fx:error</code></a>
+</td>
+<td>
+triggered on an element if an exception occurs during a <code>fetch()</code>
+</td>
+</tr>
+<tr>
+<td>
+<a href="#fxfinally"><code>fx:finally</code></a>
+</td>
+<td>
+triggered on an element triggered after a request no matter what
+</td>
+</tr>
+<tr>
+<td>
+<a href="#fxswapped"><code>fx:swapped</code></a>
+</td>
+<td>
+triggered after the swap and any associated 
+<a href="https://developer.mozilla.org/en-US/docs/Web/API/View_Transition_API">View Transition</a> has completed
+</td>
+</tr>
+</tbody>
+</table>
 
 #### Initialization Events
 
@@ -374,6 +454,10 @@ swapping.
 
 The  `fx:finally` event is triggered regardless if an error occurs or not and can be used to clean up after a request.
 Again the `evt.detail.cfg` object is available for modification.
+
+##### `fx:swapped`
+
+The  `fx:swapped` event is triggered once the swap and any associated View Transitions complete.
 
 ## Examples
 
