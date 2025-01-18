@@ -433,8 +433,8 @@ document.addEventListener("fx:init", (evt)=>{
   #indicator {
     display: none;
   }
-  #indicator {
-    display: block;
+  #indicator .fixi-request-in-flight {
+    display: inline-block;
   }
 </style>
 <button fx-action="/demo" ext-fx-indicator="#indicator">
