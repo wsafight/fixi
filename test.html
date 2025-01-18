@@ -214,6 +214,25 @@
     </div>
 
     <div class="test">
+        <h3>Test nested added content is live</h3>
+        <script>
+            test(async ()=>{
+                mock("/demo", "<p><button fx-action='/demo2'>Button 2</button></p>");
+                mock("/demo2", "<div>Foo</div>");
+                find('button').click();
+                await sleep(50);
+                assertEq(find('button')?.innerText, "Button 2");
+                find('button').click();
+                await sleep(50);
+                assertEq(find('div')?.innerText, "Foo");
+            })
+        </script>
+        <button fx-action="/demo">
+            Button 1
+        </button>
+    </div>
+
+    <div class="test">
         <h3>Test double-click works when drop disabled</h3>
         <script>
             test(async ()=>{
