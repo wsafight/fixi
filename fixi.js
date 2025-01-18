@@ -67,7 +67,7 @@
     }
   }
   document.addEventListener("DOMContentLoaded", ()=>{
-    const observer = new MutationObserver((recs)=>recs.forEach((r)=>r.type === "childList" && r.addedNodes.forEach((n)=>process(n))))
+    let observer = new MutationObserver((recs)=>recs.forEach((r)=>r.type === "childList" && r.addedNodes.forEach((n)=>process(n))))
     observer.observe(document.body, {childList:true, subtree:true})
     process(document.body)
   })
