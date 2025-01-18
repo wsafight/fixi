@@ -468,3 +468,19 @@ DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN
 AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
 OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 ```
+
+<h2>&#xe11c; <i>Memento mori</i></h2>
+
+```js
+/**
+* Adding a single line to this file requires great internal reflection
+* and thought.  You must ask yourself if your one line addition is so
+* important, so critical to the success of the company, that it warrants
+* a slowdown for every user on every page load.  Adding a single letter
+* here could cost thousands of man hours around the world.
+* 
+* That is all.
+*/
+```
+
+- [A comment](https://www.youtube.com/watch?v=wHlyLEPtL9o&t=1528s) at the beginning of [Primer](https://gist.github.com/makinde/376039)
