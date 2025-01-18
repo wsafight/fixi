@@ -35,12 +35,12 @@
                     testElt.classList.add("passed");
                     testElt.insertAdjacentHTML('beforeend', `<p>Passed</p>`)
                     passed++;
-                    document.querySelector(".passed-info").querySelector("output").innerText = passed;
+                    document.querySelector(".passed-info").querySelector("output").innerText = 'passed';
                 } catch (e) {
                     testElt.classList.add("failed");
                     testElt.insertAdjacentHTML('beforeend', `<p>ERROR: ${e}</p>`)
                     failed++;
-                    document.querySelector(".failed-info").querySelector("output").innerText = failed;
+                    document.querySelector(".failed-info").querySelector("output").innerText = 'failed';
                 } finally {
                     window.fetch = originalFetch;
                     currentTest = null;
@@ -380,7 +380,7 @@
         </div>
 
         <div class="test">
-            <h3>Test confirm-based can debouncing</h3>
+            <h3>Test confirm-based debouncing works as expected</h3>
             <script>
               test(async ()=>{
                 mock("/demo", ()=>`<div>Foo</div>`);
@@ -608,10 +608,10 @@
                 button.addEventListener("fx:before", (evt)=>{
                   evt.preventDefault(); // don't make the request
                 })
-                button.addEventListener("fx:inited", (evt)=>{
+                button.addEventListener("fx:inited", ()=>{
                   button.classList.add("fx-inited")
                 })
-                button.parentElement.addEventListener("fx:inited", (evt)=>{
+                button.parentElement.addEventListener("fx:inited", ()=>{
                   button.classList.add("fx-inited")
                 })
             </script>
