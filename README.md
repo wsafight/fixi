@@ -226,7 +226,7 @@ When fixi receives a response it triggers the `fx:after` event with the `respons
 `evt.detail.cfg` object.  These can be inspected, and the `text` value can be updated if you want to transform it.
 
 fixi then swaps the response text into the DOM using the mechanism specified by `fx-swap`, targeting the element specified
-by `fx-target`.  If the `hx-swap` attribute is not present, fixi will use `outerHTML`.  If the `fx-target` attribute 
+by `fx-target`.  If the `fx-swap` attribute is not present, fixi will use `outerHTML`.  If the `fx-target` attribute 
 is not present, it will target the element making the request.  
 
 The swap mechanism and target can be changed in the request-related fixi events.
@@ -487,7 +487,7 @@ document.addEventListener("fx:init", (evt)=>{
 })
 ```
 ```html
-<button hx-action="/demo" ext-fx-disable>
+<button fx-action="/demo" ext-fx-disable>
   Demo
 </button>
 ```
