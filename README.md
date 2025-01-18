@@ -100,7 +100,7 @@ fixi is not distributed via [NPM](https://www.npmjs.com/).
 
 ## API
 
-The fixi api consists of six [attributes](#attributes) & eight [events](#events).
+The fixi api consists of six [attributes](#attributes) & nine [events](#events).
 
 ### Attributes
 
@@ -299,7 +299,7 @@ triggered on new content added to the DOM that is not filtered via the <code>fx-
 </td>
 </tr>
 <tr>
-<td rowspan="5"><a href="#fetch-events">fetch</a></td>
+<td rowspan="6"><a href="#fetch-events">fetch</a></td>
 <td>
 <a href="#fxconfig"><code>fx:config</code></a>
 </td>
