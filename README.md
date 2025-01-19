@@ -36,10 +36,10 @@ fixi takes advantage of some modern JavaScript features not used by htmx:
 
 ## Minimalism
 
-fixi is in part an experiment in [software minimalism](https://ia601608.us.archive.org/8/items/pdfy-PeRDID4QHBNfcH7s/LeanSoftware_text.pdf).
+fixi an experiment in [software minimalism](https://ia601608.us.archive.org/8/items/pdfy-PeRDID4QHBNfcH7s/LeanSoftware_text.pdf).
 
-A goal of the project is to keep the _unminified_, _uncompressed_ library size under that of
-the minified & compressed version of [preact](https://bundlephobia.com/package/preact) (currently 4.6Kb).
+A hard constraint on the project is that the _unminified_, _uncompressed_ size must be less than that of
+the minified & compressed version of (the excellent) [preact](https://bundlephobia.com/package/preact) (currently 4.6Kb).
 
 The current uncompressed size is `3578` bytes and the gzip'd size is `1369` bytes as determined by:
 
@@ -47,12 +47,12 @@ The current uncompressed size is `3578` bytes and the gzip'd size is `1369` byte
 ls -l fixi.js | awk  '{print "raw:", $5}'; gzip -k fixi.js; ls -l fixi.js.gz | awk  '{print "gzipped:", $5}'; rm fixi.js.gz 
 ```
 
-Another design goal is that users should be able to [debug](https://developer.chrome.com/docs/devtools/javascript/) 
+Another goal is that users should be able to [debug](https://developer.chrome.com/docs/devtools/javascript/) 
 fixi easily, since it is small enough to use unminified.
 
 The code style is [dense](fixi.js), but the statements are structured for debugging.
 
-Like a fixed-gear bike, fixi has very few moving parts:
+Like a fixed-gear bike fixi has very few moving parts:
 
 * No dependencies (including test and development)
 * No JavaScript API (beyond the [events](#events))
@@ -154,23 +154,30 @@ The fixi api consists of six [attributes](#attributes) & nine [events](#events).
 
 #### Mechanism
 
-fixi works in a straight-forward manner & I encourage you to look at [the source](fixi.js) as you read through this. 
+fixi works in a straight-forward manner & I encourage you to look at [the source](fixi.js) as you read through this. The 
+three components of fixi are:
+
+* [Processing](#processing) elements in the DOM (or added to the DOM)
+* Issuing HTTP [requests](#requests) in response to events
+* [Swapping](#swapping) new HTML content into the DOM
 
 ##### Processing
 
 The main entry point is found at the bottom of the file: on the `DOMContentLoaded` event fixi does two things:
 
-* It establishes a MutationObserver to watch for newly added content
+* It establishes a MutationObserver to watch for newly added content with fixi-powered elements
 * It processes any existing fixi-powered elements
 
-fixi-powered elements are elements with the `fx-action` attribute on them.  fixi will ignore any elements that have the
-`fx-ignore` attribute on them or on a parent.
+fixi-powered elements are elements with the `fx-action` attribute on them.
 
 When fixi finds one it will establish an event listener on that element that will dispatch an AJAX request via `fetch()` to
 the URL specified by `fx-action`.
 
-The event that will trigger the request is determined by the `fx-trigger` attribute.  If that attribute is not present,
-the trigger defaults to:
+fixi will ignore any elements that have the `fx-ignore` attribute on them or on a parent.
+
+The event that will trigger the request is determined by the `fx-trigger` attribute.
+
+If that attribute is not present, the trigger defaults to:
 
 * `submit` for `form` elements
 * `change` for `input`, `select` & `textarea` elements
@@ -185,8 +192,9 @@ on an element you may use the following code:
 
 ##### Requests
 
-The [HTTP method](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods) of the request will be determined by the 
-`fx-method` attribute.  If this attribute is not present, it will default to `GET`.  This attribute is case-insensitive.
+When a request is triggered, the [HTTP method](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods) of the request 
+will be determined by the `fx-method` attribute.  If this attribute is not present, it will default to `GET`.  This 
+attribute is case-insensitive.
 
 fixi sends the [request header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers) `FX-Request`, with the value 
 `true`.  You can add or remove headers using the `evt.detail.cfg.headers` object, see the [`fx:config`](#fxconfig) event 
@@ -194,18 +202,18 @@ below.
 
 If an element is within a form element or has a `form` attribute, the values of that form will be included with the
 request.  Otherwise, if the element has a `name`, it's `name` & `value` will be sent with the request.   You can add or 
-remove values using the `evt.detail.cfg.form` `FormData` object in the `fx:config` event.
+remove values using the `evt.detail.cfg.form` `FormData` object in the [`fx:config`](#fxconfig) event.
 
 `GET` & `DELETE` requests will include values via query parameters, other request types will submit them as a form
 encoded body.
 
-Before a request is sent, the aforementioned `fx:config` event is triggered, which can be used to configure aspects of
-the request.  If `preventDefault()` is invoked, the request will not be sent.  The `evt.detail.cfg.drop` property will
-be set to `true` if there is an existing outstanding request and, if it is not set to `false`, the request will be 
-dropped.
+Before a request is sent, the aforementioned [`fx:config`](#fxconfig) event is triggered, which can be used to configure
+aspects of the request. If `preventDefault()` is invoked in this event, the request will not be sent.
+The `evt.detail.cfg.drop` property will be set to `true` if there is an existing outstanding request associated with 
+the element and, if it is not set to `false` in an event handler, the request will be dropped.
 
-In the `fx:config` event you set a property on the config, `confirm`, that should be a no-argument function. This 
-function should return a Promise and can be used to asynchronously confirm that the request should be issued:
+In the [`fx:config`](#fxconfig) event you can also set the property `evt.detail.cfg.confirm`, to a no-argument function.
+This function can return a Promise and can be used to asynchronously confirm that the request should be issued:
 
 ```js
 function showAsynConfirmDialog() {
@@ -217,29 +225,43 @@ document.addEventListener("fx:config", (evt) => {
 })
 ```
 
+Note that confirmation will only occur if the [`fx:config`](#fxconfig) event is not canceled and the request is not
+dropped.
+
 After the configuration step and the confirmation, if any, the [`fx:before`](#fxbefore) event will be triggered,
 and then a `fetch()` will be issued.
 
+When fixi receives a response it triggers the [`fx:after`](#fxafter) event.
+
+In this event (and all following events) there are two more properties available on `evt.detail.cfg`:
+
+* `response` the fetch [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response) object
+* `text` the text of the response
+
+These can be inspected, and the `text` value can be changed if you want to transform it in some way.
+
+If an error occurs the [`fx:error`](#fxerror) event will be triggered instead of `fx:after`.
+
+The [`fx:finally`](#fxfinally) event will be triggered regardles of if an error occurs or not.
+
 ##### Swapping
 
-When fixi receives a response it triggers the `fx:after` event with the `response` and `text` values stored in the
-`evt.detail.cfg` object.  These can be inspected, and the `text` value can be updated if you want to transform it.
-
 fixi then swaps the response text into the DOM using the mechanism specified by `fx-swap`, targeting the element specified
-by `fx-target`.  If the `fx-swap` attribute is not present, fixi will use `outerHTML`.  If the `fx-target` attribute 
-is not present, it will target the element making the request.  
+by `fx-target`.  If the `fx-swap` attribute is not present, fixi will use `outerHTML`.
+
+If the `fx-target` attribute is not present, it will target the element making the request.  
 
 The swap mechanism and target can be changed in the request-related fixi events.
 
-You can implement a custom swapping mechanism by setting a function in the `evt.detail.cfg.swap` property in one of
+You can implement a custom swapping mechanism by setting a function into the `evt.detail.cfg.swap` property in one of
 the request related events.  This function should take two arguments: the target element and the text to swap.
 
 By default, swapping will occur in a [View Transition](https://developer.mozilla.org/en-US/docs/Web/API/View_Transition_API)
 if they are available.  If you don't want this to occur, you can set the `evt.detail.cfg.transition` property to false
 in one of the request-related events.
 
-When the swap and any associated View Transitions have completed, the `fx:swapped` event will be triggered on the 
-element.
+Finally, when the swap and any associated View Transitions have completed, the `fx:swapped` event will be triggered on 
+the element.
 
 #### Example
 
@@ -263,7 +285,7 @@ Because the `output` element is marked as `fx-ignore`, any `fx-action` attribute
 ### Events
 
 fixi fires the following events, broken into two categories:
-[](#fetch-events)
+
 <table>
 <thead>
 <tr>
