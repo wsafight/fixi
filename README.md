@@ -336,7 +336,7 @@ triggered on an element if an exception occurs during a <code>fetch()</code>
 <a href="#fxfinally"><code>fx:finally</code></a>
 </td>
 <td>
-triggered on an element triggered after a request no matter what
+triggered on an element after a request no matter what
 </td>
 </tr>
 <tr>
