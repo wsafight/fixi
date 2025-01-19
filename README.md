@@ -541,6 +541,7 @@ document.addEventListener("fx:init", (evt)=>{
   if (elt.matches("[ext-fx-debounce]")){
     let latestPromise = null;
     elt.addEventListener("fx:config", (evt)=>{
+      evt.detail.drop = false
       evt.detail.cfg.confirm = ()=>{
         let currentPromise = latestPromise = new Promise((resolve) => { 
           setTimeout(()=>{
