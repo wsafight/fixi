@@ -103,6 +103,7 @@ You can also use the JSDelivr CDN for local development or testing:
 
 ```html
 <script src="https://cdn.jsdelivr.net/gh/bigskysoftware/fixi@0.1.1/fixi.js"
+        crossorigin="anonymous"
         integrity="sha256-yp6mPb3XNbe9nKlJLc8X0eqC5CeQivPSUH4opmD02sA="></script>
 ```
 
