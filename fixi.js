@@ -1,9 +1,10 @@
 (()=>{
   let send = (elt, type, detail, bub)=>elt.dispatchEvent(new CustomEvent("fx:" + type, {detail:detail, cancelable:true, bubbles:bub!==false, composed:true}))
   let attr = (elt, attrName, defaultVal)=>elt.getAttribute(attrName) || defaultVal
+  let ignore = (elt)=>elt.matches("[fx-ignore]") || elt.closest("[fx-ignore]") != null
   let init = (elt)=>{
     let options = {}
-    if (elt.__fixi || !send(elt, "init", {options})) return
+    if (elt.__fixi || ignore(elt) || !send(elt, "init", {options})) return
     elt.__fixi = async(evt)=>{
       let reqs = elt.__fixi.requests || (elt.__fixi.requests = [])
       let targetSelector = attr(elt, "fx-target")
@@ -64,7 +65,7 @@
   }
   let process = (elt)=>{
     if (elt instanceof Element){
-      if (!elt.matches("[fx-ignore]") && elt.closest("[fx-ignore]") == null && !send(elt, "fx:process")) return
+      if (ignore(elt) && !send(elt, "fx:process")) return
       if (elt.matches("[fx-action]")) init(elt)
       elt.querySelectorAll("[fx-action]").forEach((elt)=>init(elt))
     }

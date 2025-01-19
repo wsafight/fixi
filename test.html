@@ -1,7 +1,6 @@
 <html lang="en">
 <head>
     <title>fixi test suite</title>
-    <script src="fixi.js"></script>
     <script>
         let tests = [];
         let currentTest = null;
@@ -35,12 +34,12 @@
                     testElt.classList.add("passed");
                     testElt.insertAdjacentHTML('beforeend', `<p>Passed</p>`)
                     passed++;
-                    document.querySelector(".passed-info").querySelector("output").innerText = 'passed';
+                    document.querySelector(".passed-info").querySelector("output").innerText = passed.toString();
                 } catch (e) {
                     testElt.classList.add("failed");
                     testElt.insertAdjacentHTML('beforeend', `<p>ERROR: ${e}</p>`)
                     failed++;
-                    document.querySelector(".failed-info").querySelector("output").innerText = 'failed';
+                    document.querySelector(".failed-info").querySelector("output").innerText = failed.toString();
                 } finally {
                     window.fetch = originalFetch;
                     currentTest = null;
@@ -68,31 +67,49 @@
                 throw  `Expected ${expected} found ${actual}`
             }
         }
-        document.addEventListener("fx:init", (evt) => console.log(evt))
-        document.addEventListener("fx:process", (evt) => console.log(evt))
-        document.addEventListener("fx:before", (evt) => console.log(evt))
-        document.addEventListener("fx:after", (evt) => console.log(evt))
-        document.addEventListener("fx:error", (evt) => console.error(evt, evt.detail.error))
+        function logEvt(evt) {
+          console.log(evt.type, evt.target, evt.detail?.cfg || "", evt.detail)
+        }
+        document.addEventListener("fx:init", (evt) => logEvt(evt))
+        document.addEventListener("fx:process", (evt) => logEvt(evt))
+        document.addEventListener("fx:config", (evt) => logEvt(evt))
+        document.addEventListener("fx:before", (evt) => logEvt(evt))
+        document.addEventListener("fx:after", (evt) => logEvt(evt))
+        document.addEventListener("fx:error", (evt) => logEvt(evt))
+        document.addEventListener("fx:swapped", (evt) => logEvt(evt))
         document.addEventListener('DOMContentLoaded', async () => {
             for (let i = 0; i < document.querySelectorAll(".test").length; i++){
                 const testBlock = document.querySelectorAll(".test")[i];
-                testBlock.querySelector("h3").insertAdjacentHTML("beforeend", ` - <a id='test${i}' href="test.html#test${i}">run</a>`)
+                testBlock.querySelector("h3").insertAdjacentHTML("beforeend", ` - <a id='test${i}' href="test.html?test${i}">run</a>`)
                 let scriptElt = testBlock.querySelector("script");
                 scriptElt.insertAdjacentHTML("beforebegin", `<b>Code:</b><pre></pre>`)
                 scriptElt.previousElementSibling.innerText = scriptElt.innerText.replaceAll(/^ {8}/gm, '') + "\n";
+                if (location.search.indexOf("?test") === 0) {
+                  let index = parseInt(location.search.substring(5));
+                  if (index !== i) {
+                    testBlock.setAttribute("fx-ignore", 'true');
+                  } else {
+                    testBlock.scrollIntoView()
+                  }
+                }
             }
-            for (let i = 0; i < tests.length; i++){
-                if (location.hash.indexOf("#test") === 0) {
-                    let index = parseInt(location.hash.substring(5));
-                    if (index !== i) {
-                        continue;
-                    }
+            // let fixi initialize
+            setTimeout(async ()=>{
+              for (let i = 0; i < tests.length; i++){
+                if (location.search.indexOf("?test") === 0) {
+                  let index = parseInt(location.search.substring(5));
+                  if (index !== i) {
+                    continue;
+                  }
                 }
                 currentTest = tests[i];
                 await currentTest();
-            }
+              }
+            })
         });
+
     </script>
+    <script src="fixi.js"></script>
     <style>
         .test {
             padding: 8px;
@@ -128,7 +145,8 @@
     <div>
         <div class="passed-info">Passed: <output></output></div>
         <div class="failed-info">Failed: <output></output></div>
-        <a href="javascript:document.body.classList.toggle('hide-passed')">Toggle Passed</a>
+        <a href="javascript:document.body.classList.toggle('hide-passed')">Toggle Passed</a><br/>
+        <a href="test.html">Run All</a>
     </div>
 </header>
 
@@ -148,6 +166,20 @@
             <button fx-action="/demo">
                 Button 1
             </button>
+        </div>
+
+        <div class="test">
+            <h3>Test basic button works when added dynamically</h3>
+            <script>
+              test(async ()=>{
+                currentTest.testElt.insertAdjacentHTML('beforeEnd', `<button fx-action="/demo">Button 1</button>`)
+                await sleep(50);
+                mock("/demo", "<div>Foo</div>");
+                find('button').click();
+                await sleep(50);
+                assertEq(find('div')?.innerText, "Foo");
+              })
+            </script>
         </div>
 
         <div class="test">
@@ -463,6 +495,51 @@
                 Button 1
             </button>
         </div>
+
+    </section>
+
+    <section id="web-components">
+        <script>
+          class TestWebComponent extends HTMLElement {
+            connectedCallback() {
+              console.log(this.innerHTML)
+              this.innerHTML = this.getAttribute('data-inner-html');
+              console.log(this.innerHTML)
+            }
+          }
+          customElements.define('test-web-component', TestWebComponent)
+        </script>
+        <h2>Web Components</h2>
+
+        <div class="test">
+            <h3>Works inside web components</h3>
+            <script>
+              test(async ()=>{
+                mock("/demo", `<div>Foo</div>`);
+                let btn = find('button')
+                btn.click();
+                await sleep(50);
+                assertEq(btn.innerText, "Foo");
+              })
+            </script>
+            <test-web-component data-inner-html="<button fx-action='/demo' fx-swap='innerHTML'>Demo</button>">
+            </test-web-component>
+        </div>
+
+        <div class="test">
+            <h3>Works directly on web components</h3>
+            <script>
+              test(async ()=>{
+                mock("/demo", `<div>Foo</div>`);
+                let component = find('test-web-component')
+                component.click();
+                await sleep(50);
+                assertEq(component.innerText, "Foo");
+              })
+            </script>
+            <test-web-component fx-action='/demo' fx-swap='innerHTML' data-inner-html="Foo">
+            </test-web-component>
+        </div>
     </section>
 
     <section id="events">
@@ -624,14 +701,14 @@
 <footer>
     <h2>Scratch</h2>
 
-    <form fx-action="/foo?" fx-swap="beforeend">
-        <label>Foo
-            <input name="foo" value="bar">
-        </label>
-        <button name="blah">
-            Foo
-        </button>
-    </form>
+<!--    <form fx-action="/foo?" fx-swap="beforeend">-->
+<!--        <label>Foo-->
+<!--            <input name="foo" value="bar">-->
+<!--        </label>-->
+<!--        <button name="blah">-->
+<!--            Foo-->
+<!--        </button>-->
+<!--    </form>-->
 </footer>
 
 
