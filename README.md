@@ -5,6 +5,8 @@ of [generalized hypermedia controls](https://dl.acm.org/doi/fullHtml/10.1145/364
 
 The fixi [api](#api) consists of six [HTML attributes](#attributes) & nine [events](#events).
 
+Here is an example:
+
 ```html
 <button fx-action="/content" <!-- URL to issue request to -->
         fx-method="get"      <!-- HTTP Method to use -->
@@ -173,8 +175,8 @@ The main entry point is found at the bottom of [fixi.js](fixi.js): on the `DOMCo
 
 fixi-powered elements are elements with the `fx-action` attribute on them.
 
-When fixi finds one it will establish an event listener on that element that will dispatch an AJAX request via `fetch()` to
-the URL specified by `fx-action`.
+When fixi finds one it will establish an event listener on that element that will dispatch an AJAX request via 
+`fetch()` to the URL specified by `fx-action`.
 
 fixi will ignore any elements that have the `fx-ignore` attribute on them or on a parent.
 
@@ -204,7 +206,7 @@ fixi sends the [request header](https://developer.mozilla.org/en-US/docs/Web/HTT
 below.
 
 If an element is within a form element or has a `form` attribute, the values of that form will be included with the
-request.  Otherwise, if the element has a `name`, it's `name` & `value` will be sent with the request.   You can add or 
+request.  Otherwise, if the element has a `name`, its `name` & `value` will be sent with the request.   You can add or 
 remove values using the `evt.detail.cfg.form` `FormData` object in the [`fx:config`](#fxconfig) event.
 
 `GET` & `DELETE` requests will include values via query parameters, other request types will submit them as a form
@@ -213,9 +215,9 @@ encoded body.
 Before a request is sent, the aforementioned [`fx:config`](#fxconfig) event is triggered, which can be used to configure
 aspects of the request. If `preventDefault()` is invoked in this event, the request will not be sent.
 The `evt.detail.cfg.drop` property will be set to `true` if there is an existing outstanding request associated with 
-the element and, if it is not set to `false` in an event handler, the request will be dropped.
+the element and, if it is not set to `false` in an event handler, the request will be dropped (i.e. not issued).
 
-In the [`fx:config`](#fxconfig) event you can also set the property `evt.detail.cfg.confirm`, to a no-argument function.
+In the [`fx:config`](#fxconfig) event you can also set the `evt.detail.cfg.confirm` property to a no-argument function.
 This function can return a Promise and can be used to asynchronously confirm that the request should be issued:
 
 ```js
@@ -232,11 +234,12 @@ Note that confirmation will only occur if the [`fx:config`](#fxconfig) event is 
 dropped.
 
 After the configuration step and the confirmation, if any, the [`fx:before`](#fxbefore) event will be triggered,
-and then a `fetch()` will be issued.
+and then a `fetch()` will be issued.  The `evt.detail.cfg` object from the events above  is passed to the `fetch()` 
+function as the second [RequestInit](https://developer.mozilla.org/en-US/docs/Web/API/RequestInit) argument.
 
 When fixi receives a response it triggers the [`fx:after`](#fxafter) event.
 
-In this event (and all following events) there are two more properties available on `evt.detail.cfg`:
+In this event there are two more properties available on `evt.detail.cfg`:
 
 * `response` the fetch [Response](https://developer.mozilla.org/en-US/docs/Web/API/Response) object
 * `text` the text of the response
@@ -245,7 +248,23 @@ These can be inspected, and the `text` value can be changed if you want to trans
 
 If an error occurs the [`fx:error`](#fxerror) event will be triggered instead of `fx:after`.
 
-The [`fx:finally`](#fxfinally) event will be triggered regardles of if an error occurs or not.
+Note that `fetch()` only triggers errors 
+[when a request fails due to a bad URL or network error](https://developer.mozilla.org/en-US/docs/Web/API/Window/fetch),
+so valid HTTP responses with non-`200` response codes will not trigger an error.  If you wish to handle those differently
+you should check the response code in the `fx:after` event:
+
+```js
+document.addEventListener("fx:after", (evt)=>{
+  // rewire 404s to the body, remove current head so new head can replace it
+  if (evt.detail.cfg.response.status == 404){
+    document.head.remove()
+    evt.detail.cfg.target = docuement.body
+    evt.detail.cfg.swap = 'outerHTML'
+  }
+})
+```
+
+The [`fx:finally`](#fxfinally) event will be triggered regardless if an error occurs or not.
 
 ##### Swapping
 
@@ -266,12 +285,11 @@ in one of the request-related events.
 Finally, when the swap and any associated View Transitions have completed, the `fx:swapped` event will be triggered on 
 the element.
 
-#### Example
+#### Complete Example
 
-Here is an example using all the attributes available in fixi:
+Here is an complete example using all the attributes available in fixi:
 
 ```html
-
 <button fx-action="/demo" fx-method="GET" 
         fx-target="#output" fx-swap="innerHTML" 
         fx-trigger="click">
