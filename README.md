@@ -3,7 +3,7 @@
 fixi is an experimental, minimalist implementation
 of [generalized hypermedia controls](https://dl.acm.org/doi/fullHtml/10.1145/3648188.3675127)
 
-The fixi [api](#api) consists of six [attributes](#attributes) & nine [events](#events).
+The fixi [api](#api) consists of six [HTML attributes](#attributes) & nine [events](#events).
 
 ```html
 <button fx-action="/content" <!-- URL to issue request to -->
