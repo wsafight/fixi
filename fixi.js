@@ -65,7 +65,7 @@
   }
   let process = (elt)=>{
     if (elt instanceof Element){
-      if (ignore(elt) && !send(elt, "fx:process")) return
+      if (ignore(elt) || !send(elt, "fx:process")) return
       if (elt.matches("[fx-action]")) init(elt)
       elt.querySelectorAll("[fx-action]").forEach((elt)=>init(elt))
     }
