@@ -1,7 +1,7 @@
 <h1>&#x1F6B2; fixi</h1> 
 
 fixi is an experimental, minimalist implementation
-of [generalized hypermedia controls](https://dl.acm.org/doi/fullHtml/10.1145/3648188.3675127):
+of [generalized hypermedia controls](https://dl.acm.org/doi/fullHtml/10.1145/3648188.3675127)
 
 ```html
 <button fx-action="/content" fx-method="get" fx-target="#output" fx-swap="innerHTML">
