@@ -93,7 +93,7 @@ You can also use the JSDelivr CDN for local development or testing:
 ```html
 
 <script src="https://cdn.jsdelivr.net/gh/bigskysoftware/fixi@0.0.8/fixi.js"
-        integrity="z0z+TAG1J/4z7yGaN/rREdX+eVC7/7cgyvrVD/oI7bknPUQ="></script>
+        integrity="sha256-z0z+TAG1J/4z7yGaN/rREdX+eVC7/7cgyvrVD/oI7bknPUQ="></script>
 ```
 
 fixi is not distributed via [NPM](https://www.npmjs.com/).
