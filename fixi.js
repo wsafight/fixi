@@ -3,7 +3,7 @@
   let attr = (elt, attrName, defaultVal)=>elt.getAttribute(attrName) || defaultVal
   let init = (elt)=>{
     let options = {}
-    if (elt.__fixi || !send(elt, "init", {args:options})) return
+    if (elt.__fixi || !send(elt, "init", {options})) return
     elt.__fixi = async(evt)=>{
       let reqs = elt.__fixi.requests || (elt.__fixi.requests = [])
       let targetSelector = attr(elt, "fx-target")
