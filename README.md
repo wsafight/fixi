@@ -513,7 +513,7 @@ fixi adds two properties to elements in the DOM
 <tbody>
 <tr>
 <td>
-<code>document.__fixi_mo</code>
+<a href="#document__fixi_mo"><code>document.__fixi_mo</code></a>
 </td>
 <td>
 The MutationObserver that fixi uses to watch for new content to process new fixi-powered elements.
@@ -521,7 +521,7 @@ The MutationObserver that fixi uses to watch for new content to process new fixi
 </tr>
 <tr>
 <td>
-<code>elt.__fixi</code>
+<a href="#elt__fixi"><code>elt.__fixi</code></a>
 </td>
 <td>
 The MutationObserver that fixi uses to watch for new content to process new fixi-powered elements.
