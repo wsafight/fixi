@@ -700,15 +700,17 @@
 
 <footer>
     <h2>Scratch</h2>
-
-<!--    <form fx-action="/foo?" fx-swap="beforeend">-->
-<!--        <label>Foo-->
-<!--            <input name="foo" value="bar">-->
-<!--        </label>-->
-<!--        <button name="blah">-->
-<!--            Foo-->
-<!--        </button>-->
-<!--    </form>-->
+    <script>
+        function insertElts() {
+          let footer = document.querySelector('footer')
+          for(let i = 0; i < 5000; i++) {
+            footer.insertAdjacentHTML("beforeend", "<div><span fx-action='/foo'>asdf</span></div>")
+          }
+        }
+    </script>
+    <button onclick="insertElts()">
+        Add Stuff
+    </button>
 </footer>
 
 

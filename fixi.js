@@ -57,7 +57,7 @@
       } else {
         await doSwap()
       }
-      send(elt, "swapped")
+      send(elt, "swapped", {cfg})
     }
     elt.__fixi.evt = attr(elt, "fx-trigger", elt.matches("form") ? "submit" : elt.matches("input,select,textarea") ? "change" : "click")
     elt.addEventListener(elt.__fixi.evt, elt.__fixi, options)
@@ -65,14 +65,15 @@
   }
   let process = (elt)=>{
     if (elt instanceof Element){
-      if (ignore(elt) || !send(elt, "fx:process")) return
+      if (ignore(elt)) return
       if (elt.matches("[fx-action]")) init(elt)
       elt.querySelectorAll("[fx-action]").forEach((elt)=>init(elt))
     }
   }
+  document.addEventListener("fx:process", (evt) => process(evt.target))
   document.addEventListener("DOMContentLoaded", ()=>{
-    let observer = new MutationObserver((recs)=>recs.forEach((r)=>r.type === "childList" && r.addedNodes.forEach((n)=>process(n))))
-    observer.observe(document.body, {childList:true, subtree:true})
+    document.__fixi_mo = new MutationObserver((recs)=>recs.forEach((r)=>r.type === "childList" && r.addedNodes.forEach((n)=>process(n))))
+    document.__fixi_mo.observe(document.body, {childList:true, subtree:true})
     process(document.body)
   })
 })()
