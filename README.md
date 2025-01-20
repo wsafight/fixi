@@ -3,7 +3,7 @@
 fixi is an experimental, minimalist implementation
 of [generalized hypermedia controls](https://dl.acm.org/doi/fullHtml/10.1145/3648188.3675127)
 
-The fixi [api](#api) consists of six [HTML attributes](#attributes), nine [events](#events) & two [attributes](#attributes)
+The fixi [api](#api) consists of six [HTML attributes](#attributes), nine [events](#events) & two [properties](#properties)
 
 Here is an example:
 
@@ -499,9 +499,9 @@ Again the `evt.detail.cfg` object is available for modification.
 The  `fx:swapped` event is triggered once the swap and any associated View Transitions complete.  The 
 `evt.detail.cfg` object is available.
 
-### Attributes
+### Properties
 
-fixi adds two attributes to elements on the DOM
+fixi adds two properties to elements in the DOM
 
 <table>
 <thead>
