@@ -1,4 +1,4 @@
-<h1>&#x1F6B2; fixi</h1> 
+<h1>&#x1F6B2; fixi.js</h1> 
 
 fixi is an experimental, minimalist implementation
 of [generalized hypermedia controls](https://dl.acm.org/doi/fullHtml/10.1145/3648188.3675127)
@@ -161,7 +161,7 @@ fixi is not distributed via [NPM](https://www.npmjs.com/).
 </tbody>
 </table>
 
-#### Mechanism
+#### Modus Operandi
 
 fixi works in a straight-forward manner & I encourage you to look at [the source](fixi.js) as you read through this. The 
 three components of fixi are:
@@ -764,3 +764,4 @@ OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 ```
 
 -- [A comment](https://www.youtube.com/watch?v=wHlyLEPtL9o&t=1528s) at the beginning of [Primer](https://gist.github.com/makinde/376039)
+
