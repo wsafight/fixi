@@ -1,6 +1,6 @@
 <h1>&#x1F6B2; fixi.js</h1> 
 
-fixi is an experimental, minimalist implementation
+[fixi.js](https://swag.htmx.org/products/fixi-js-tee) is an experimental, minimalist implementation
 of [generalized hypermedia controls](https://dl.acm.org/doi/fullHtml/10.1145/3648188.3675127)
 
 The fixi [api](#api) consists of six [HTML attributes](#attributes), nine [events](#events) & two [properties](#properties)
