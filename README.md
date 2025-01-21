@@ -1,4 +1,4 @@
-<h1>&#x1F6B2; fixi.js<br/><small style="font-size: 8px"><i>it ain't much...</i></small></h1> 
+<h1>&#x1F6B2; fixi.js - <i>it ain't much...</i></h1> 
 
 
 [fixi.js](https://swag.htmx.org/products/fixi-js-tee) is an experimental, minimalist implementation
