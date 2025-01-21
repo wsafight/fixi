@@ -1,4 +1,5 @@
-<h1>&#x1F6B2; fixi.js</h1> 
+<h1>&#x1F6B2; fixi.js<br/></h1> 
+<small><i>it ain't much...</i></small>
 
 [fixi.js](https://swag.htmx.org/products/fixi-js-tee) is an experimental, minimalist implementation
 of [generalized hypermedia controls](https://dl.acm.org/doi/fullHtml/10.1145/3648188.3675127)
