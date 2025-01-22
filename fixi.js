@@ -1,4 +1,5 @@
 (()=>{
+	const doc = document
 	let send = (elt, type, detail, bub)=>elt.dispatchEvent(new CustomEvent("fx:" + type, {detail:detail, cancelable:true, bubbles:bub !== false, composed:true}))
 	let attr = (elt, attrName, defaultVal)=>elt.getAttribute(attrName) || defaultVal
 	let ignore = (elt)=>elt.matches("[fx-ignore]") || elt.closest("[fx-ignore]") != null
@@ -8,7 +9,7 @@
 		elt.__fixi = async(evt)=>{
 			let reqs = elt.__fixi.requests || (elt.__fixi.requests = [])
 			let targetSelector = attr(elt, "fx-target")
-			let target = targetSelector ? document.querySelector(targetSelector) : elt
+			let target = targetSelector ? doc.querySelector(targetSelector) : elt
 			let headers = {"FX-Request":"true"}
 			let method = attr(elt, "fx-method", "GET").toUpperCase()
 			let action = attr(elt, "fx-action", "")
@@ -52,8 +53,8 @@
 					cfg.target.insertAdjacentHTML(cfg.swap, cfg.text)
 				}
 			}
-			if (cfg.transition && document.startViewTransition){
-				await document.startViewTransition(doSwap).finished
+			if (cfg.transition && doc.startViewTransition){
+				await doc.startViewTransition(doSwap).finished
 			} else {
 				await doSwap()
 			}
@@ -70,10 +71,10 @@
 			elt.querySelectorAll("[fx-action]").forEach((elt)=>init(elt))
 		}
 	}
-	document.addEventListener("fx:process", (evt)=>process(evt.target))
-	document.addEventListener("DOMContentLoaded", ()=>{
-		document.__fixi_mo = new MutationObserver((recs)=>recs.forEach((r)=>r.type === "childList" && r.addedNodes.forEach((n)=>process(n))))
-		document.__fixi_mo.observe(document.body, {childList:true, subtree:true})
-		process(document.body)
+	doc.addEventListener("fx:process", (evt)=>process(evt.target))
+	doc.addEventListener("DOMContentLoaded", ()=>{
+		doc.__fixi_mo = new MutationObserver((recs)=>recs.forEach((r)=>r.type === "childList" && r.addedNodes.forEach((n)=>process(n))))
+		doc.__fixi_mo.observe(doc.body, {childList:true, subtree:true})
+		process(doc.body)
 	})
 })()
